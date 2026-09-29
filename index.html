@@ -480,45 +480,86 @@
     .badge-roi.med { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
     .badge-roi.low { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.3); }
 
-    /* Interactive Sandbox */
-    .sandbox-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 12px;
-      margin-top: 14px;
-    }
-
-    @media (max-width: 900px) {
-      .sandbox-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    .sandbox-item {
-      background: #090d16;
-      border: 1px solid #1e293b;
-      border-radius: 8px;
-      padding: 10px;
-    }
-
-    .sandbox-item label {
+    /* Privacy & Security Banner */
+    .privacy-banner {
       display: flex;
+      align-items: center;
       justify-content: space-between;
-      font-size: 11px;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 12px 18px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+    }
+    .privacy-banner-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 280px;
+    }
+    .privacy-shield-icon {
+      font-size: 20px;
+      line-height: 1;
+    }
+    .privacy-text {
+      font-size: 13px;
+      color: #e2e8f0;
+      line-height: 1.4;
+    }
+    .privacy-text strong {
+      color: var(--success);
+    }
+    .btn-github-source {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 12px;
       font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 6px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .btn-github-source:hover {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-1px);
     }
 
-    .sandbox-item input[type="number"] {
-      width: 100%;
-      background: #121929;
-      border: 1px solid #334155;
-      color: #fff;
-      border-radius: 4px;
-      padding: 6px 8px;
+    /* Drop Tier Badges */
+    .drop-tier-chips {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      margin-top: 8px;
+    }
+    .drop-chip {
+      font-size: 10px;
       font-family: var(--mono);
-      font-size: 13px;
+      padding: 3px 4px;
+      border-radius: 4px;
+      text-align: center;
+      border: 1px solid var(--card-border);
+      background: rgba(15, 23, 42, 0.6);
+      white-space: nowrap;
+    }
+    .drop-chip.active {
+      color: #4ade80;
+      border-color: rgba(74, 222, 128, 0.4);
+      background: rgba(74, 222, 128, 0.12);
+      font-weight: 700;
+    }
+    .drop-chip.locked {
+      color: var(--text-muted);
+      opacity: 0.65;
     }
 
     /* Wave Timeline */
@@ -551,6 +592,22 @@
     <h1><span>Fortress Wave Simulator</span> & Comp Optimizer</h1>
     <p class="subtitle">Live combat tick simulation, dynamic party cycle modeling, exhaustive role solver & skill upgrade roadmap.</p>
   </header>
+
+  <!-- Client-Side Security & Open Source Banner -->
+  <div class="privacy-banner">
+    <div class="privacy-banner-left">
+      <span class="privacy-shield-icon">🛡️</span>
+      <div class="privacy-text">
+        <strong>100% Client-Side & Private:</strong> All simulations and combat calculations run locally in your browser memory. No player data, stats, or logs are ever transmitted to external servers.
+      </div>
+    </div>
+    <a href="https://github.com/adversaryicu/fortress-calculator" target="_blank" rel="noopener noreferrer" class="btn-github-source">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+      </svg>
+      <span>View Source on GitHub</span>
+    </a>
+  </div>
 
   <!-- Step 1: Console Snippet & Instructions -->
   <div class="grid-2">
@@ -921,9 +978,19 @@
       <div class="hero-stat-sub" id="resWipeReason">Wiped on Wave 19 (Health Depleted)</div>
     </div>
     <div class="hero-stat-card green">
-      <div class="hero-stat-label">Optimized Comp Advantage</div>
-      <div class="hero-stat-val" id="resWaveDelta">+4 Waves</div>
-      <div class="hero-stat-sub" id="resTimeDelta">+100.0s Longer Survival vs Standard</div>
+      <div class="hero-stat-label">Rare Loot Drop Chance</div>
+      <div class="hero-stat-val" id="resDropOverall" style="font-size: 20px; color: var(--success);">--</div>
+      <div class="hero-stat-sub" id="resDropSub">Cumulative per-run probability</div>
+      <div class="drop-tier-chips" id="resDropTiers">
+        <span class="drop-chip locked">T1: --</span>
+        <span class="drop-chip locked">T2: --</span>
+        <span class="drop-chip locked">T3: --</span>
+        <span class="drop-chip locked">T4: --</span>
+        <span class="drop-chip locked">T5: --</span>
+        <span class="drop-chip locked">C6: --</span>
+        <span class="drop-chip locked">C7: --</span>
+        <span class="drop-chip locked">Peak: --</span>
+      </div>
     </div>
     <div class="hero-stat-card">
       <div class="hero-stat-label">Best Role Composition</div>
@@ -1050,24 +1117,6 @@
         <!-- Injected via JS -->
       </tbody>
     </table>
-  </div>
-
-  <!-- Interactive What-If Sandbox -->
-  <div class="card" style="margin-bottom: 24px;">
-    <div class="card-title">
-      <span>Interactive "What-If" Skill Sandbox</span>
-      <span style="font-size: 12px; color: var(--text-muted);">Adjust Skill Levels in Real Time to Test Projections</span>
-    </div>
-
-    <div class="sandbox-grid" id="sandboxInputs">
-      <!-- 10 Skill Inputs Injected via JS -->
-    </div>
-
-    <div style="margin-top: 14px; display: flex; justify-content: flex-end; gap: 10px;">
-      <button class="btn-copy" style="position: static;" onclick="resetSandboxLevels()">Reset to Audit</button>
-      <button class="btn-copy" style="position: static; background: var(--purple); border-color: var(--purple);" onclick="setAllSandboxLevels(20)">Set All to Lv 20 (T2 Milestone)</button>
-      <button class="btn-copy" style="position: static; background: var(--primary); color: #000; border-color: var(--primary);" onclick="applySandboxAndRun()">Simulate Sandbox Levels</button>
-    </div>
   </div>
 
   <!-- Wave-by-Wave Combat Log -->
@@ -1252,8 +1301,7 @@ let activeRoleStats = {};
 function showEmptyState() {
   document.getElementById('resMaxWave').textContent = '--';
   document.getElementById('resWipeReason').textContent = 'Paste your audit JSON above and click Run';
-  document.getElementById('resWaveDelta').textContent = '--';
-  document.getElementById('resTimeDelta').textContent = 'Awaiting data...';
+  renderDropRates(0);
   document.getElementById('resBestCompSummary').textContent = '--';
   document.getElementById('resBottleneckTitle').textContent = '--';
   document.getElementById('resBottleneckSub').textContent = 'Awaiting data...';
@@ -1322,7 +1370,6 @@ function onJsonInputChanged() {
     if (data.bagCapacity !== undefined) {
       document.getElementById('numBagSize').value = data.bagCapacity;
     }
-    buildSandboxInputs(data);
   } catch (e) {
     // waiting for full paste
   }
@@ -1331,7 +1378,6 @@ function onJsonInputChanged() {
 function init() {
   document.getElementById('txtJsonInput').value = '';
   document.getElementById('lblLoadedPlayer').textContent = 'Awaiting Data...';
-  buildSandboxInputs({ roles: [] });
   showEmptyState();
 }
 
@@ -1642,7 +1688,6 @@ function runFullOptimizer() {
     if (data.bagCapacity !== undefined) {
       document.getElementById('numBagSize').value = data.bagCapacity;
     }
-    buildSandboxInputs(data);
   } catch (e) {
     alert("Invalid JSON format. Please check the pasted JSON data.");
     return;
@@ -1711,10 +1756,8 @@ function runFullOptimizer() {
   document.getElementById('resMaxWave').textContent = `Wave ${best.res.survivedWaves} Cleared`;
   document.getElementById('resWipeReason').textContent = `Wiped on Wave ${best.res.wipeWave} (${best.res.wipeReason})`;
 
-  const waveDelta = best.res.survivedWaves - standard.res.survivedWaves;
-  const timeDelta = (best.res.wipeTime - standard.res.wipeTime).toFixed(1);
-  document.getElementById('resWaveDelta').textContent = (waveDelta >= 0 ? `+${waveDelta}` : waveDelta) + ' Waves';
-  document.getElementById('resTimeDelta').textContent = `+${timeDelta}s Longer Survival vs Standard`;
+  // Render Rare Drop Rates
+  renderDropRates(best.res.survivedWaves);
 
   // Format best composition summary
   const roleCounts = {};
@@ -1988,145 +2031,111 @@ function renderWaveTimeline(waveLog, wipeWave, wipeReason) {
   tbody.appendChild(wipeTr);
 }
 
-// Sandbox Inputs
-function buildSandboxInputs(data) {
-  const skills = [
-    { id: 'fish', name: 'Fish (HP Gather)' },
-    { id: 'cook', name: 'Cook (HP Process)' },
-    { id: 'mine', name: 'Mine (Mel Gather)' },
-    { id: 'smith', name: 'Smith (Mel Process)' },
-    { id: 'forage', name: 'Forage (Rng Gather)' },
-    { id: 'craft', name: 'Craft (Rng Process)' },
-    { id: 'invoke', name: 'Invoke (Mag Gather)' },
-    { id: 'imbue', name: 'Imbue (Mag Process)' },
-    { id: 'farm', name: 'Farm (Def Gather)' },
-    { id: 'brew', name: 'Brew (Def Process)' }
-  ];
+// ==========================================
+// Rare Loot Drop Rate Calculations
+// ==========================================
+const GAUNTLET_TIERS = [
+  { id: 'T1', name: 'Feeble', startWave: 1 },
+  { id: 'T2', name: 'Dire', startWave: 21 },
+  { id: 'T3', name: 'Savage', startWave: 41 },
+  { id: 'T4', name: 'Fell', startWave: 61 },
+  { id: 'T5', name: 'Ancient', startWave: 81 },
+  { id: 'C6', name: 'Chaos', startWave: 101 },
+  { id: 'C7', name: 'High Chaos', startWave: 121 }
+];
+const GAUNTLET_RARE_DROP_BASE = 0.0002381;
+const GAUNTLET_RARE_CAP_L = 64;
 
-  const container = document.getElementById('sandboxInputs');
-  container.innerHTML = '';
+function calculateDropProbabilities(clearedWaves) {
+  if (!clearedWaves || clearedWaves <= 0) {
+    return { overall: 0, tiers: {}, peakWave: 0 };
+  }
+  let noDropOverall = 1.0;
+  const tierResults = {};
 
-  skills.forEach(s => {
-    let lvl = 10;
-    if (data.roles) {
-      data.roles.forEach(r => {
-        if (r.gatherSkill === s.id) lvl = r.gatherLevel;
-        if (r.processSkill === s.id) lvl = r.processLevel;
-      });
-    }
-
-    const div = document.createElement('div');
-    div.className = 'sandbox-item';
-    div.innerHTML = `
-      <label><span>${s.name}</span><span id="tierLabel_${s.id}">T${Math.floor(lvl / 10)}</span></label>
-      <input type="number" id="sb_${s.id}" min="1" max="99" value="${lvl}" onchange="updateTierBadge('${s.id}')">
-    `;
-    container.appendChild(div);
-  });
-}
-
-function updateTierBadge(skillId) {
-  const val = parseInt(document.getElementById('sb_' + skillId).value, 10) || 1;
-  const tier = val >= 100 ? 10 : Math.floor(val / 10);
-  const el = document.getElementById('tierLabel_' + skillId);
-  if (el) el.textContent = `T${tier}`;
-}
-
-function resetSandboxLevels() {
-  buildSandboxInputs(currentAudit);
-  applySandboxAndRun();
-}
-
-function setAllSandboxLevels(lvl) {
-  const ids = ['fish', 'cook', 'mine', 'smith', 'forage', 'craft', 'invoke', 'imbue', 'farm', 'brew'];
-  ids.forEach(id => {
-    const el = document.getElementById('sb_' + id);
-    if (el) {
-      el.value = lvl;
-      updateTierBadge(id);
+  GAUNTLET_TIERS.forEach(t => {
+    if (clearedWaves < t.startWave) {
+      tierResults[t.id] = { unlocked: false, prob: 0, startWave: t.startWave };
+    } else {
+      let noDropTier = 1.0;
+      for (let w = t.startWave; w <= clearedWaves; w++) {
+        const k = Math.min(w - t.startWave + 1, GAUNTLET_RARE_CAP_L);
+        const p = k * GAUNTLET_RARE_DROP_BASE;
+        noDropTier *= (1 - p);
+      }
+      tierResults[t.id] = { unlocked: true, prob: 1 - noDropTier, startWave: t.startWave };
     }
   });
-  applySandboxAndRun();
-}
 
-function applySandboxAndRun() {
-  const getVal = (id) => parseInt(document.getElementById('sb_' + id).value, 10) || 1;
-  const bag = parseInt(document.getElementById('numBagSize').value, 10) || 28;
+  for (let w = 1; w <= clearedWaves; w++) {
+    let noDropThisWave = 1.0;
+    GAUNTLET_TIERS.forEach(t => {
+      if (w >= t.startWave) {
+        const k = Math.min(w - t.startWave + 1, GAUNTLET_RARE_CAP_L);
+        const p = k * GAUNTLET_RARE_DROP_BASE;
+        noDropThisWave *= (1 - p);
+      }
+    });
+    noDropOverall *= noDropThisWave;
+  }
 
-  const getAuditRole = (roleName) => (currentAudit && currentAudit.roles) ? currentAudit.roles.find(r => r.role === roleName) : null;
-  const h = computeRoleYield('fish', getVal('fish'), 'cook', getVal('cook'), bag, getAuditRole('Health'));
-  const mel = computeRoleYield('mine', getVal('mine'), 'smith', getVal('smith'), bag, getAuditRole('Melee Force'));
-  const rng = computeRoleYield('forage', getVal('forage'), 'craft', getVal('craft'), bag, getAuditRole('Range Force'));
-  const mag = computeRoleYield('invoke', getVal('invoke'), 'imbue', getVal('imbue'), bag, getAuditRole('Magic Force'));
-  const def = computeRoleYield('farm', getVal('farm'), 'brew', getVal('brew'), bag, getAuditRole('Defense'));
+  // Peak wave rate (rate on the final cleared wave)
+  let noDropPeak = 1.0;
+  GAUNTLET_TIERS.forEach(t => {
+    if (clearedWaves >= t.startWave) {
+      const k = Math.min(clearedWaves - t.startWave + 1, GAUNTLET_RARE_CAP_L);
+      noDropPeak *= (1 - (k * GAUNTLET_RARE_DROP_BASE));
+    }
+  });
 
-  activeRoleStats = {
-    'Health': { role: 'Health', gatherSkill: 'fish', gatherLevel: getVal('fish'), gSuccess: h.gSuccess, gDouble: h.gDouble, gatherActionTime: h.gatherActionTime, processSkill: 'cook', processLevel: getVal('cook'), pSuccess: h.pSuccess, pSave: h.pSave, processActionTime: h.processActionTime, walkDistance: h.walkDistance || 610, statYield: h.statYield, expectedItemsFinished: h.expectedItems, maxStatYield: h.maxStatYield, statValuePerItem: h.statValuePerItem },
-    'Melee Force': { role: 'Melee Force', gatherSkill: 'mine', gatherLevel: getVal('mine'), gSuccess: mel.gSuccess, gDouble: mel.gDouble, gatherActionTime: mel.gatherActionTime, processSkill: 'smith', processLevel: getVal('smith'), pSuccess: mel.pSuccess, pSave: mel.pSave, processActionTime: mel.processActionTime, walkDistance: mel.walkDistance || 610, statYield: mel.statYield, expectedItemsFinished: mel.expectedItems, maxStatYield: mel.maxStatYield, statValuePerItem: mel.statValuePerItem },
-    'Range Force': { role: 'Range Force', gatherSkill: 'forage', gatherLevel: getVal('forage'), gSuccess: rng.gSuccess, gDouble: rng.gDouble, gatherActionTime: rng.gatherActionTime, processSkill: 'craft', processLevel: getVal('craft'), pSuccess: rng.pSuccess, pSave: rng.pSave, processActionTime: rng.processActionTime, walkDistance: rng.walkDistance || 610, statYield: rng.statYield, expectedItemsFinished: rng.expectedItems, maxStatYield: rng.maxStatYield, statValuePerItem: rng.statValuePerItem },
-    'Magic Force': { role: 'Magic Force', gatherSkill: 'invoke', gatherLevel: getVal('invoke'), gSuccess: mag.gSuccess, gDouble: mag.gDouble, gatherActionTime: mag.gatherActionTime, processSkill: 'imbue', processLevel: getVal('imbue'), pSuccess: mag.pSuccess, pSave: mag.pSave, processActionTime: mag.processActionTime, walkDistance: mag.walkDistance || 610, statYield: mag.statYield, expectedItemsFinished: mag.expectedItems, maxStatYield: mag.maxStatYield, statValuePerItem: mag.statValuePerItem },
-    'Defense': { role: 'Defense', gatherSkill: 'farm', gatherLevel: getVal('farm'), gSuccess: def.gSuccess, gDouble: def.gDouble, gatherActionTime: def.gatherActionTime, processSkill: 'brew', processLevel: getVal('brew'), pSuccess: def.pSuccess, pSave: def.pSave, processActionTime: def.processActionTime, walkDistance: def.walkDistance || 610, statYield: def.statYield, expectedItemsFinished: def.expectedItems, maxStatYield: def.maxStatYield, statValuePerItem: def.statValuePerItem }
+  return {
+    overall: 1 - noDropOverall,
+    tiers: tierResults,
+    peakWave: 1 - noDropPeak
   };
+}
 
-  const partySize = parseInt(document.getElementById('selPartySize').value, 10);
-  const hostSpeed = parseFloat(document.getElementById('numHostSpeed').value) || 13.2;
-  const cloneSpeed = parseFloat(document.getElementById('numCloneSpeed').value) || 11.9;
+function renderDropRates(clearedWaves) {
+  const elOverall = document.getElementById('resDropOverall');
+  const elSub = document.getElementById('resDropSub');
+  const elTiers = document.getElementById('resDropTiers');
+  if (!elOverall || !elTiers) return;
 
-  const { best, standard } = findOptimalComposition(activeRoleStats, partySize, hostSpeed, cloneSpeed, bag);
-
-  document.getElementById('resMaxWave').textContent = `Wave ${best.res.survivedWaves} Cleared`;
-  document.getElementById('resWipeReason').textContent = `Wiped on Wave ${best.res.wipeWave} (${best.res.wipeReason})`;
-
-  const waveDelta = best.res.survivedWaves - standard.res.survivedWaves;
-  const timeDelta = (best.res.wipeTime - standard.res.wipeTime).toFixed(1);
-  document.getElementById('resWaveDelta').textContent = (waveDelta >= 0 ? `+${waveDelta}` : waveDelta) + ' Waves';
-  document.getElementById('resTimeDelta').textContent = `+${timeDelta}s Longer Survival vs Standard`;
-
-  const roleCounts = {};
-  best.comp.forEach(r => { roleCounts[r] = (roleCounts[r] || 0) + 1; });
-  const compTokens = [];
-  if (roleCounts['Health']) compTokens.push(`${roleCounts['Health']}x HP`);
-  if (roleCounts['Melee Force']) compTokens.push(`${roleCounts['Melee Force']}x Mel`);
-  if (roleCounts['Range Force']) compTokens.push(`${roleCounts['Range Force']}x Rng`);
-  if (roleCounts['Magic Force']) compTokens.push(`${roleCounts['Magic Force']}x Mag`);
-  if (roleCounts['Defense']) compTokens.push(`${roleCounts['Defense']}x Def`);
-  document.getElementById('resBestCompSummary').textContent = compTokens.join(', ');
-
-  renderRolePills('stdRolePills', standard.comp);
-  renderRolePills('optRolePills', best.comp);
-
-  document.getElementById('stdWaves').textContent = standard.res.survivedWaves;
-  document.getElementById('stdWipeWave').textContent = 'Wave ' + standard.res.wipeWave;
-  document.getElementById('stdWipeReason').textContent = `${standard.res.wipeReason} (${(standard.res.wipeTime / 60).toFixed(1)} mins)`;
-  document.getElementById('stdHp').textContent = `${standard.res.finalArmy.health.toFixed(0)} HP`;
-  document.getElementById('stdForce').textContent = `${(standard.res.finalArmy.melee + standard.res.finalArmy.range + standard.res.finalArmy.magic).toFixed(0)} Force`;
-  document.getElementById('stdDef').textContent = `${standard.res.finalArmy.defense.toFixed(0)} Defense`;
-
-  document.getElementById('optWaves').textContent = best.res.survivedWaves;
-  document.getElementById('optWipeWave').textContent = 'Wave ' + best.res.wipeWave;
-  document.getElementById('optWipeReason').textContent = `${best.res.wipeReason} (${(best.res.wipeTime / 60).toFixed(1)} mins)`;
-  document.getElementById('optHp').textContent = `${best.res.finalArmy.health.toFixed(0)} HP`;
-  document.getElementById('optForce').textContent = `${(best.res.finalArmy.melee + best.res.finalArmy.range + best.res.finalArmy.magic).toFixed(0)} Force`;
-  const elOptDef = document.getElementById('optDef');
-  if (elOptDef) elOptDef.textContent = `${best.res.finalArmy.defense.toFixed(0)} Defense`;
-
-  try {
-    renderUpgradeAnalysis(partySize, hostSpeed, cloneSpeed, bag, best.res.survivedWaves);
-  } catch (err) {
-    console.error("Sandbox renderUpgradeAnalysis failed:", err);
+  if (!clearedWaves || clearedWaves <= 0) {
+    elOverall.textContent = '--';
+    if (elSub) elSub.textContent = 'Cumulative per-run probability';
+    elTiers.innerHTML = `
+      <span class="drop-chip locked">T1: --</span>
+      <span class="drop-chip locked">T2: --</span>
+      <span class="drop-chip locked">T3: --</span>
+      <span class="drop-chip locked">T4: --</span>
+      <span class="drop-chip locked">T5: --</span>
+      <span class="drop-chip locked">C6: --</span>
+      <span class="drop-chip locked">C7: --</span>
+      <span class="drop-chip locked">Peak: --</span>
+    `;
+    return;
   }
 
-  try {
-    renderPartyContribution(best.res.players);
-  } catch (err) {
-    console.error("Sandbox renderPartyContribution failed:", err);
-  }
+  const dropStats = calculateDropProbabilities(clearedWaves);
+  const overallPct = (dropStats.overall * 100).toFixed(1);
+  const odds = dropStats.overall > 0 ? `~1 in ${Math.round(1 / dropStats.overall)} runs` : '--';
+  elOverall.textContent = `${overallPct}% Overall`;
+  if (elSub) elSub.textContent = `${odds} (thru Wave ${clearedWaves})`;
 
-  try {
-    renderWaveTimeline(best.res.waveLog, best.res.wipeWave, best.res.wipeReason);
-  } catch (err) {
-    console.error("Sandbox renderWaveTimeline failed:", err);
-  }
+  let chipsHtml = '';
+  GAUNTLET_TIERS.forEach(t => {
+    const info = dropStats.tiers[t.id];
+    if (info.unlocked) {
+      const pct = (info.prob * 100).toFixed(1);
+      chipsHtml += `<span class="drop-chip active" title="${t.name} Band (Wave ${t.startWave}+): ${(info.prob * 100).toFixed(2)}% run chance">${t.id}: ${pct}%</span>`;
+    } else {
+      chipsHtml += `<span class="drop-chip locked" title="Unlocks at Wave ${t.startWave}">${t.id}: W${t.startWave}</span>`;
+    }
+  });
+  const peakPct = (dropStats.peakWave * 100).toFixed(2);
+  chipsHtml += `<span class="drop-chip active" style="border-color:rgba(56,189,248,0.4);color:#38bdf8;" title="Peak drop chance on the final wave alone">${peakPct}%/w</span>`;
+  elTiers.innerHTML = chipsHtml;
 }
 
 // Party Delivery & Personal Contribution Breakdown rendering
