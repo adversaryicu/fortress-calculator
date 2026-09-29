@@ -2,7 +2,7 @@
 
 An interactive, client-side combat simulator, party composition solver, and upgrade roadmap engine for Fortress / Gauntlet skilling raids.
 
-🔗 **Live Tool**: [https://adversaryicu.github.io/fortress-calculator/](https://adversaryicu.github.io/fortress-calculator/)
+**Live Tool**: [https://adversaryicu.github.io/fortress-calculator/](https://adversaryicu.github.io/fortress-calculator/)
 
 ---
 
@@ -14,12 +14,12 @@ The **Fortress Wave Simulator** bridges the gap between player skilling stats an
 
 ## Key Features
 
-### 🛡️ 100% Client-Side & Private
+### 100% Client-Side & Private
 - **Zero External Telemetry**: All combat iterations, party solvers, and audit data processing execute strictly inside your local browser memory.
 - **Open Source**: Full source code is inspectable in this repository.
 
-### 🎮 Dynamic In-Game Data Extractor
-- Extract your real account stats with a single copy-paste in DevTools (`F12` $\rightarrow$ Console).
+### Dynamic In-Game Data Extractor
+- Extract your real account stats with a single copy-paste in DevTools (`F12` -> Console).
 - **No Hardcoded Values**: Dynamically evaluates live bonuses:
   - **Dynamic Movement Speeds**: Evaluates Vigor levels, effective level gear/pets/capes/tools, telescope and shiny telescope relics, swift beacons, enchanted compasses, milestone banners, ledgers, raid tree talents, and collector bonuses for both Host and Clones (`0.9x`).
   - **Real Node Path Distances**: Measures precise arena traversal distances using in-game pathfinding or live map node coordinates (`ClientState.getPathDistance` / `ClientState.nodesData`).
@@ -27,12 +27,12 @@ The **Fortress Wave Simulator** bridges the gap between player skilling stats an
   - **Dynamic Bag Capacity**: Automatically counts base slots plus unlocked satchels.
   - **Robust Clipboard Pipeline**: Uses multi-stage fallback (DevTools native `copy()`, offscreen textarea selection, and modern Clipboard API).
 
-### ⚔️ Combat Tick & Delivery Simulation Engine
+### Combat Tick & Delivery Simulation Engine
 - **Tick-by-Tick Combat**: Models front-wave damage mitigation (`DEF_K = 600`), 3 attack damage lanes (Melee, Range, Magic) with shield defense weighting (`1.5x`), and wave health depletion.
 - **Overrun Mechanics**: Simulates wave timeouts, DPS checks, Fortress health attrition, and the lethal 3-wave stack cap overrun rule.
 - **Logistical Cycle Modeling**: Simulates continuous deposit deliveries from the Host and Clones based on individual cycle and travel times.
 
-### 🧠 Exhaustive 350-Composition Solver
+### Exhaustive 350-Composition Solver
 - Iterates and tests all **350 valid party role multisets** across the 5 combat roles:
   - **Health** (Fish + Cook)
   - **Melee Force** (Mine + Smith)
@@ -42,7 +42,7 @@ The **Fortress Wave Simulator** bridges the gap between player skilling stats an
 - Identifies the provably optimal composition to maximize wave depth.
 - Displays a head-to-head comparison between the optimal setup and the standard balanced composition (1 of each role).
 
-### 💎 Rare Loot Drop Probability Engine
+### Rare Loot Drop Probability Engine
 - Derives odds from the official Gauntlet loot formulas (`GAUNTLET_RARE_DROP_BASE = 0.0002381`, `GAUNTLET_RARE_CAP_L = 64` plateau).
 - **Cumulative Run Probability**: Calculates your total cumulative odds of receiving at least one rare drop across your run (e.g. `4.0% Overall`, `~1 in 25 runs`).
 - **All 7 Reward Tiers**: Displays individual activation status and per-run drop chances for every tier:
@@ -55,15 +55,15 @@ The **Fortress Wave Simulator** bridges the gap between player skilling stats an
   - **Chaos C7 (High Chaos)**: Unlocks Wave 121
 - **Peak Rate**: Displays the drop roll chance on the highest cleared wave alone.
 
-### 🚀 Upgrade Sensitivity & Roadmap
+### Upgrade Sensitivity & Roadmap
 - **#1 Priority Bottleneck**: Automatically highlights the single biggest bottleneck holding your party back (e.g., an un-tiered skill cap limiting stat yield).
 - **ROI Upgrade Table**: Projects wave gains and cycle improvements for leveling each skill (+1 Level, +5 Levels, or to the next Tier milestone), ranked by efficiency.
 
-### 👥 Party Contribution & Wave Timeline
+### Party Contribution & Wave Timeline
 - **Team Delivery Breakdown**: Table showing trips completed, items processed, total stats contributed, and percentage share between the Host and Clones.
 - **Wave-by-Wave Timeline**: Complete log of every wave survived, detailing spawn times, enemy HP, wave defense, remaining fortress health, and wipe causes.
 
-### ⚡ Zero Dependencies
+### Zero Dependencies
 - Pure vanilla HTML5, modern CSS, and vanilla JavaScript.
 - Lightweight, fast-loading, offline-capable, and fully responsive on desktop and mobile.
 
@@ -75,7 +75,7 @@ The **Fortress Wave Simulator** bridges the gap between player skilling stats an
 2. In your game browser tab, press `F12` to open DevTools and switch to the **Console** tab.
 3. Paste the extractor snippet from **Step 1** and press `Enter`. The script audits your account and copies the JSON data to your clipboard.
 4. Paste the JSON into **Step 2** on the simulator page.
-5. Click **⚡ Run Simulation & Find Best Comp** to view your results, loot probabilities, and upgrade recommendations!
+5. Click **Run Simulation & Find Best Comp** to view your results, loot probabilities, and upgrade recommendations!
 
 ---
 
