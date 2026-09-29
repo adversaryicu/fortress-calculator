@@ -575,16 +575,17 @@
     }
 
     const roles = [
-        { id: 'fish',   gather: 'fish',   process: 'cook',  stat: 'Health' },
-        { id: 'mine',   gather: 'mine',   process: 'smith', stat: 'Melee Force' },
-        { id: 'forage', gather: 'forage', process: 'craft', stat: 'Range Force' },
-        { id: 'invoke', gather: 'invoke', process: 'imbue', stat: 'Magic Force' },
-        { id: 'farm',   gather: 'farm',   process: 'brew',  stat: 'Defense' }
+        { id: 'fish',   gather: 'fish',   process: 'cook',  stat: 'Health',       gatherNodeId: 'gauntlet_fish',   processNodeId: 'gauntlet_cook' },
+        { id: 'mine',   gather: 'mine',   process: 'smith', stat: 'Melee Force',  gatherNodeId: 'gauntlet_mine',   processNodeId: 'gauntlet_smith' },
+        { id: 'forage', gather: 'forage', process: 'craft', stat: 'Range Force',  gatherNodeId: 'gauntlet_forage', processNodeId: 'gauntlet_craft' },
+        { id: 'invoke', gather: 'invoke', process: 'imbue', stat: 'Magic Force',  gatherNodeId: 'gauntlet_invoke', processNodeId: 'gauntlet_imbue' },
+        { id: 'farm',   gather: 'farm',   process: 'brew',  stat: 'Defense',      gatherNodeId: 'gauntlet_farm',   processNodeId: 'gauntlet_brew' }
     ];
 
     const getLevel = (s) => (ClientState.skills[s] && ClientState.skills[s].level) || 1;
     const getTier = (pairLvl) => pairLvl >= 100 ? 10 : Math.floor(pairLvl / 10);
     const getReqLevel = (tier) => (tier === 0 ? 1 : tier * 10);
+    const haste = (typeof Constants !== 'undefined' && Constants.GAUNTLET_HASTE) ? Constants.GAUNTLET_HASTE : 10;
 
     const getSuccess = (skill, req) => {
         if (typeof ClientState.successChanceFor === 'function') return ClientState.successChanceFor(skill, req);
@@ -599,6 +600,20 @@
         return 0;
     };
 
+    const getDuration = (skill, req) => {
+        if (typeof ClientState.actionDurationFor === 'function') return ClientState.actionDurationFor(skill, req);
+        const lvl = getLevel(skill);
+        const base = (typeof Constants !== 'undefined' && Constants.actionDuration) 
+            ? Constants.actionDuration(lvl, req) 
+            : (10 - (lvl - 1) * 0.01);
+        const vigorLvl = (ClientState.skills && ClientState.skills.vigor && ClientState.skills.vigor.level) || 1;
+        const vigorRed = (typeof Constants !== 'undefined' && Constants.vigorActionReduction)
+            ? Constants.vigorActionReduction(vigorLvl)
+            : (vigorLvl + 1) * 0.005;
+        const minDur = (typeof Constants !== 'undefined' && Constants.MIN_ACTION_DURATION) || 2.0;
+        return Math.max(minDur, base - vigorRed);
+    };
+
     const getDepositVal = (tier) => {
         if (typeof Constants !== 'undefined' && Constants.gauntletDepositValue) return Constants.gauntletDepositValue(tier);
         return Math.round(2 * Math.pow(1.35, tier));
@@ -608,6 +623,22 @@
         ? Object.keys(ClientState.unlocks.satchels).filter(k => ClientState.unlocks.satchels[k]).length : 0;
     const bagSize = (typeof Constants !== 'undefined' && Constants.INVENTORY_SLOTS ? Constants.INVENTORY_SLOTS : 28) 
         + satchelCount * (typeof Constants !== 'undefined' && Constants.SATCHEL_SLOTS_PER ? Constants.SATCHEL_SLOTS_PER : 4);
+
+    const calcArenaWalkDistance = (roleDef) => {
+        try {
+            const nodes = ClientState.nodesData || [];
+            const byId = {};
+            for (let i = 0; i < nodes.length; i++) byId[nodes[i].id] = nodes[i];
+            const center = byId['gauntlet_raid'];
+            const gNode = byId[roleDef.gatherNodeId];
+            const pNode = byId[roleDef.processNodeId];
+            if (center && gNode && pNode) {
+                const d = (a, b) => Math.hypot(a.position.x - b.position.x, a.position.y - b.position.y);
+                return Math.round(d(center, gNode) + d(gNode, pNode) + d(pNode, center));
+            }
+        } catch(e) {}
+        return 610;
+    };
 
     const calcLiveMovementSpeed = () => {
         const vigorLevel = (ClientState.skills && ClientState.skills.vigor && ClientState.skills.vigor.level) || 1;
@@ -706,6 +737,8 @@
         bagCapacity: bagSize,
         hostSpeed: hostSpeed,
         cloneSpeed: cloneSpeed,
+        haste: haste,
+        walkDistance: 610,
         skills: ClientState.skills,
         roles: []
     };
@@ -719,11 +752,24 @@
         const pSuccess = getSuccess(r.process, reqLvl);
         const gDouble = getDoubleOrSave(r.gather, reqLvl);
         const pSave = getDoubleOrSave(r.process, reqLvl);
+        const gRawDuration = getDuration(r.gather, reqLvl);
+        const pRawDuration = getDuration(r.process, reqLvl);
+        const gActionTime = Number((gRawDuration / haste).toFixed(3));
+        const pActionTime = Number((pRawDuration / haste).toFixed(3));
         const tierVal = getDepositVal(tier);
+        const walkDist = calcArenaWalkDistance(r);
 
-        const effectiveConversion = Math.min(1, pSuccess / (1 - pSave * (1 - pSuccess)));
+        const effectiveConversion = Math.min(1, pSuccess / (1 - pSave * pSuccess));
         const expectedItems = Number((bagSize * effectiveConversion).toFixed(1));
         const expectedStat = Number((expectedItems * tierVal).toFixed(1));
+
+        // Cycle time breakdown
+        const attemptsGather = bagSize / (gSuccess * (1 + gDouble));
+        const gatherTime = attemptsGather * gActionTime;
+        const attemptsProcess = bagSize / Math.max(0.01, 1 - pSave * pSuccess);
+        const processTime = attemptsProcess * pActionTime;
+        const walkTimeHost = walkDist / hostSpeed;
+        const cycleTimeHost = Number((walkTimeHost + gatherTime + processTime).toFixed(1));
 
         report.roles.push({
             role: r.stat,
@@ -731,10 +777,12 @@
             gatherLevel: gLvl,
             gatherSuccessPct: Number((gSuccess * 100).toFixed(1)),
             gatherDoublePct: Number((gDouble * 100).toFixed(1)),
+            gatherActionTime: gActionTime,
             processSkill: r.process,
             processLevel: pLvl,
             processSuccessPct: Number((pSuccess * 100).toFixed(1)),
             processSavePct: Number((pSave * 100).toFixed(1)),
+            processActionTime: pActionTime,
             activeTier: tier,
             tierRequiredLevel: reqLvl,
             statValuePerItem: tierVal,
@@ -742,6 +790,8 @@
             bagCapacity: bagSize,
             expectedStatYield: expectedStat,
             maxStatYield: bagSize * tierVal,
+            walkDistance: walkDist,
+            cycleTimeHost: cycleTimeHost,
             efficiencyPct: Number(((expectedStat / (bagSize * tierVal)) * 100).toFixed(1))
         });
     });
@@ -823,7 +873,7 @@
 
       <textarea id="txtJsonInput" spellcheck="false" placeholder="Paste your audit JSON here (Ctrl + V)..." oninput="onJsonInputChanged()"></textarea>
 
-      <div class="party-controls">
+      <div class="party-controls" style="grid-template-columns: 1fr 1fr;">
         <div class="control-group">
           <label>Party Size <span style="color:var(--primary);font-size:10px;">(Auto)</span></label>
           <select id="selPartySize">
@@ -835,18 +885,23 @@
           </select>
         </div>
         <div class="control-group">
-          <label>Host Speed <span style="color:var(--primary);font-size:10px;">(Auto)</span></label>
-          <input type="number" step="0.1" id="numHostSpeed" value="13.2">
-        </div>
-        <div class="control-group">
-          <label>Clone Speed <span style="color:var(--primary);font-size:10px;">(Auto)</span></label>
-          <input type="number" step="0.1" id="numCloneSpeed" value="11.9">
-        </div>
-        <div class="control-group">
           <label>Bag Slots <span style="color:var(--primary);font-size:10px;">(Auto)</span></label>
           <input type="number" id="numBagSize" value="28">
         </div>
       </div>
+
+      <!-- Live Speed & Engine Metrics (Dynamic from Audit) -->
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;font-size:12px;color:var(--text-muted);background:rgba(15,23,42,0.6);padding:10px 14px;border-radius:8px;border:1px solid var(--card-border);align-items:center;">
+        <span>🏃 Host Speed: <strong id="lblHostSpeed" style="color:var(--primary);font-family:var(--mono);">-- spd</strong></span>
+        <span style="color:var(--card-border);">|</span>
+        <span>👥 Clone Speed: <strong id="lblCloneSpeed" style="color:#a855f7;font-family:var(--mono);">-- spd</strong> <span style="font-size:10px;">(0.9x)</span></span>
+        <span style="color:var(--card-border);">|</span>
+        <span>⚡ Gauntlet Haste: <strong style="color:var(--success);font-family:var(--mono);">10x</strong></span>
+        <span style="color:var(--card-border);">|</span>
+        <span>🗺️ Loop Track: <strong style="color:var(--text-main);font-family:var(--mono);">610 px</strong></span>
+      </div>
+      <input type="hidden" id="numHostSpeed" value="13.2">
+      <input type="hidden" id="numCloneSpeed" value="11.9">
 
       <button class="btn-run" onclick="runFullOptimizer()">⚡ Run Simulation & Find Best Comp</button>
     </div>
@@ -1217,6 +1272,10 @@ function showEmptyState() {
   if (tblParty) {
     tblParty.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:24px;">Paste audit data and run simulation to view party delivery breakdown.</td></tr>';
   }
+  const lblHost = document.getElementById('lblHostSpeed');
+  if (lblHost) lblHost.textContent = '-- spd';
+  const lblClone = document.getElementById('lblCloneSpeed');
+  if (lblClone) lblClone.textContent = '-- spd';
 }
 
 function onJsonInputChanged() {
@@ -1236,12 +1295,21 @@ function onJsonInputChanged() {
       document.getElementById('selPartySize').value = String(data.partySize);
     }
     if (data.hostSpeed !== undefined) {
-      document.getElementById('numHostSpeed').value = Number(data.hostSpeed).toFixed(1);
+      const hSpd = Number(data.hostSpeed).toFixed(1);
+      document.getElementById('numHostSpeed').value = hSpd;
+      const lblHost = document.getElementById('lblHostSpeed');
+      if (lblHost) lblHost.textContent = hSpd + ' spd';
     }
     if (data.cloneSpeed !== undefined) {
-      document.getElementById('numCloneSpeed').value = Number(data.cloneSpeed).toFixed(1);
+      const cSpd = Number(data.cloneSpeed).toFixed(1);
+      document.getElementById('numCloneSpeed').value = cSpd;
+      const lblClone = document.getElementById('lblCloneSpeed');
+      if (lblClone) lblClone.textContent = cSpd + ' spd';
     } else if (data.hostSpeed !== undefined) {
-      document.getElementById('numCloneSpeed').value = (data.hostSpeed * 0.9).toFixed(1);
+      const cSpd = (data.hostSpeed * 0.9).toFixed(1);
+      document.getElementById('numCloneSpeed').value = cSpd;
+      const lblClone = document.getElementById('lblCloneSpeed');
+      if (lblClone) lblClone.textContent = cSpd + ' spd';
     }
     if (data.bagCapacity !== undefined) {
       document.getElementById('numBagSize').value = data.bagCapacity;
@@ -1292,8 +1360,8 @@ function fallbackCopy(text, cb) {
   document.body.removeChild(ta);
 }
 
-// Compute role yield dynamically given levels and bag size
-function computeRoleYield(gatherSkill, gatherLvl, processSkill, processLvl, bagSize = 28) {
+// Compute role yield dynamically given levels, bag size, and live audited reductions
+function computeRoleYield(gatherSkill, gatherLvl, processSkill, processLvl, bagSize = 28, baseAuditRole = null) {
   const pairLvl = Math.min(gatherLvl, processLvl);
   const tier = pairLvl >= 100 ? 10 : Math.floor(pairLvl / 10);
   const reqLvl = tier === 0 ? 1 : tier * 10;
@@ -1304,9 +1372,24 @@ function computeRoleYield(gatherSkill, gatherLvl, processSkill, processLvl, bagS
   const pSave = 0.006;
   const tierVal = Math.round(2 * Math.pow(1.35, tier));
 
-  const effectiveConversion = Math.min(1, pSuccess / (1 - pSave * (1 - pSuccess)));
+  const effectiveConversion = Math.min(1, pSuccess / (1 - pSave * pSuccess));
   const expectedItems = Number((bagSize * effectiveConversion).toFixed(1));
   const expectedStat = Number((expectedItems * tierVal).toFixed(1));
+
+  let gActionTime = 0.9;
+  let pActionTime = 0.9;
+  if (baseAuditRole && baseAuditRole.gatherActionTime) {
+    const lvlDiffG = gatherLvl - (baseAuditRole.gatherLevel || 10);
+    gActionTime = Math.max(0.2, Number((baseAuditRole.gatherActionTime - lvlDiffG * 0.001).toFixed(3)));
+  } else {
+    gActionTime = Number((Math.max(2.0, 10 - (gatherLvl - 1) * 0.01) / 10).toFixed(3));
+  }
+  if (baseAuditRole && baseAuditRole.processActionTime) {
+    const lvlDiffP = processLvl - (baseAuditRole.processLevel || 10);
+    pActionTime = Math.max(0.2, Number((baseAuditRole.processActionTime - lvlDiffP * 0.001).toFixed(3)));
+  } else {
+    pActionTime = Number((Math.max(2.0, 10 - (processLvl - 1) * 0.01) / 10).toFixed(3));
+  }
 
   return {
     tier,
@@ -1314,10 +1397,13 @@ function computeRoleYield(gatherSkill, gatherLvl, processSkill, processLvl, bagS
     gSuccess: gSuccess * 100,
     pSuccess: pSuccess * 100,
     gDouble: gDouble * 100,
+    pSave: pSave * 100,
+    gatherActionTime: gActionTime,
+    processActionTime: pActionTime,
     tierVal,
     expectedItems,
     statYield: expectedStat,
-    actionDuration: 9.35,
+    walkDistance: (baseAuditRole && baseAuditRole.walkDistance) || 610,
     maxStatYield: bagSize * tierVal,
     statValuePerItem: tierVal
   };
@@ -1327,12 +1413,22 @@ function computeRoleYield(gatherSkill, gatherLvl, processSkill, processLvl, bagS
 function simulateCombat(party, runSeed = 12345) {
   let army = { health: 10, currentHealth: 10, melee: 10, range: 10, magic: 10, defense: 10 };
   const players = party.map(p => {
-    const walkTime = 610 / p.speed;
-    const attemptsGather = p.bag / ((p.gSuccess / 100) * (1 + (p.gDouble / 100)));
-    const gatherTime = attemptsGather * (p.actionDuration / HASTE);
-    const processTime = p.bag * (p.actionDuration / HASTE);
+    const walkDist = p.walkDistance || 610;
+    const walkTime = walkDist / p.speed;
+    const gSuccess = p.gSuccess / 100;
+    const gDouble = p.gDouble / 100;
+    const attemptsGather = p.bag / (gSuccess * (1 + gDouble));
+    const gActionTime = p.gatherActionTime || (p.actionDuration ? p.actionDuration / HASTE : 0.2);
+    const gatherTime = attemptsGather * gActionTime;
+
+    const pSuccess = p.pSuccess / 100;
+    const pSave = p.pSave / 100;
+    const attemptsProcess = p.bag / Math.max(0.01, 1 - pSave * pSuccess);
+    const pActionTime = p.processActionTime || (p.actionDuration ? p.actionDuration / HASTE : 0.2);
+    const processTime = attemptsProcess * pActionTime;
+
     const cycleTime = walkTime + gatherTime + processTime;
-    return { ...p, cycleTime, nextDepositTime: cycleTime, depositCount: 0 };
+    return { ...p, walkDistance: walkDist, cycleTime, nextDepositTime: cycleTime, depositCount: 0 };
   });
 
   let waves = [];
@@ -1555,9 +1651,17 @@ function runFullOptimizer() {
     currentAudit.roles.forEach(r => {
       activeRoleStats[r.role] = {
         role: r.role,
+        gatherSkill: r.gatherSkill,
+        gatherLevel: r.gatherLevel,
         gSuccess: r.gatherSuccessPct || 75,
         gDouble: r.gatherDoublePct || 0.8,
-        actionDuration: 9.35,
+        gatherActionTime: r.gatherActionTime || 0.9,
+        processSkill: r.processSkill,
+        processLevel: r.processLevel,
+        pSuccess: r.processSuccessPct || 75,
+        pSave: r.processSavePct || 0.6,
+        processActionTime: r.processActionTime || 0.9,
+        walkDistance: r.walkDistance || 610,
         statYield: r.expectedStatYield || 60,
         expectedItemsFinished: r.expectedItemsFinished || (r.expectedStatYield ? Number((r.expectedStatYield / (r.statValuePerItem || 3)).toFixed(1)) : 20),
         maxStatYield: r.maxStatYield || (r.bagCapacity ? r.bagCapacity * (r.statValuePerItem || 3) : 84),
@@ -1568,11 +1672,11 @@ function runFullOptimizer() {
 
   // Ensure all 5 roles exist with fallback
   const fallbackRoles = [
-    { role: 'Health', g: 78.8, y: 65.4, items: 21.8, max: 84, val: 3 },
-    { role: 'Melee Force', g: 71.8, y: 60.3, items: 20.1, max: 84, val: 3 },
-    { role: 'Range Force', g: 78.8, y: 59.7, items: 19.9, max: 84, val: 3 },
-    { role: 'Magic Force', g: 79.8, y: 43.6, items: 21.8, max: 56, val: 2 },
-    { role: 'Defense', g: 77.8, y: 60.3, items: 20.1, max: 84, val: 3 }
+    { role: 'Health', g: 78.8, y: 65.4, items: 21.8, max: 84, val: 3, gAct: 0.88, pAct: 0.88 },
+    { role: 'Melee Force', g: 71.8, y: 60.3, items: 20.1, max: 84, val: 3, gAct: 0.95, pAct: 0.95 },
+    { role: 'Range Force', g: 78.8, y: 59.7, items: 19.9, max: 84, val: 3, gAct: 0.88, pAct: 0.96 },
+    { role: 'Magic Force', g: 79.8, y: 43.6, items: 21.8, max: 56, val: 2, gAct: 0.96, pAct: 0.98 },
+    { role: 'Defense', g: 77.8, y: 60.3, items: 20.1, max: 84, val: 3, gAct: 0.89, pAct: 0.95 }
   ];
   fallbackRoles.forEach(fb => {
     if (!activeRoleStats[fb.role]) {
@@ -1580,7 +1684,11 @@ function runFullOptimizer() {
         role: fb.role,
         gSuccess: fb.g,
         gDouble: 0.8,
-        actionDuration: 9.35,
+        gatherActionTime: fb.gAct,
+        pSuccess: fb.g,
+        pSave: 0.6,
+        processActionTime: fb.pAct,
+        walkDistance: 610,
         statYield: fb.y,
         expectedItemsFinished: fb.items,
         maxStatYield: fb.max,
@@ -1678,15 +1786,16 @@ function renderUpgradeAnalysis(partySize, hostSpeed, cloneSpeed, bag, baselineWa
   skillsConfig.forEach(sc => {
     // Determine current level from audit
     let gLvl = 10, pLvl = 10;
+    let match = null;
     if (currentAudit.roles) {
-      const match = currentAudit.roles.find(r => r.role === sc.role);
+      match = currentAudit.roles.find(r => r.role === sc.role);
       if (match) {
         gLvl = match.gatherLevel;
         pLvl = match.processLevel;
       }
     }
 
-    const curYieldObj = computeRoleYield(sc.gather, gLvl, sc.process, pLvl, bag);
+    const curYieldObj = computeRoleYield(sc.gather, gLvl, sc.process, pLvl, bag, match);
     const curTier = curYieldObj.tier;
     const nextTierReq = (curTier + 1) * 10;
 
@@ -1695,16 +1804,27 @@ function renderUpgradeAnalysis(partySize, hostSpeed, cloneSpeed, bag, baselineWa
     const newGLvl = gLvl <= pLvl ? nextTierReq : gLvl;
     const newPLvl = pLvl < gLvl ? nextTierReq : (gLvl <= pLvl ? pLvl : nextTierReq);
 
-    const upYieldObj = computeRoleYield(sc.gather, newGLvl, sc.process, newPLvl, bag);
+    const upYieldObj = computeRoleYield(sc.gather, newGLvl, sc.process, newPLvl, bag, match);
 
     // Simulate scenario with this role upgraded
     const testMap = { ...activeRoleStats };
     testMap[sc.role] = {
       role: sc.role,
+      gatherSkill: sc.gather,
+      gatherLevel: newGLvl,
       gSuccess: upYieldObj.gSuccess,
       gDouble: upYieldObj.gDouble,
-      actionDuration: 9.35,
-      statYield: upYieldObj.statYield
+      gatherActionTime: upYieldObj.gatherActionTime,
+      processSkill: sc.process,
+      processLevel: newPLvl,
+      pSuccess: upYieldObj.pSuccess,
+      pSave: upYieldObj.pSave,
+      processActionTime: upYieldObj.processActionTime,
+      walkDistance: upYieldObj.walkDistance || 610,
+      statYield: upYieldObj.statYield,
+      expectedItemsFinished: upYieldObj.expectedItems,
+      maxStatYield: upYieldObj.maxStatYield,
+      statValuePerItem: upYieldObj.statValuePerItem
     };
 
     const optResult = findOptimalComposition(testMap, partySize, hostSpeed, cloneSpeed, bag);
@@ -1864,18 +1984,19 @@ function applySandboxAndRun() {
   const getVal = (id) => parseInt(document.getElementById('sb_' + id).value, 10) || 1;
   const bag = parseInt(document.getElementById('numBagSize').value, 10) || 28;
 
-  const h = computeRoleYield('fish', getVal('fish'), 'cook', getVal('cook'), bag);
-  const mel = computeRoleYield('mine', getVal('mine'), 'smith', getVal('smith'), bag);
-  const rng = computeRoleYield('forage', getVal('forage'), 'craft', getVal('craft'), bag);
-  const mag = computeRoleYield('invoke', getVal('invoke'), 'imbue', getVal('imbue'), bag);
-  const def = computeRoleYield('farm', getVal('farm'), 'brew', getVal('brew'), bag);
+  const getAuditRole = (roleName) => (currentAudit && currentAudit.roles) ? currentAudit.roles.find(r => r.role === roleName) : null;
+  const h = computeRoleYield('fish', getVal('fish'), 'cook', getVal('cook'), bag, getAuditRole('Health'));
+  const mel = computeRoleYield('mine', getVal('mine'), 'smith', getVal('smith'), bag, getAuditRole('Melee Force'));
+  const rng = computeRoleYield('forage', getVal('forage'), 'craft', getVal('craft'), bag, getAuditRole('Range Force'));
+  const mag = computeRoleYield('invoke', getVal('invoke'), 'imbue', getVal('imbue'), bag, getAuditRole('Magic Force'));
+  const def = computeRoleYield('farm', getVal('farm'), 'brew', getVal('brew'), bag, getAuditRole('Defense'));
 
   activeRoleStats = {
-    'Health': { role: 'Health', gSuccess: h.gSuccess, gDouble: h.gDouble, actionDuration: 9.35, statYield: h.statYield, expectedItemsFinished: h.expectedItems, maxStatYield: h.maxStatYield, statValuePerItem: h.statValuePerItem },
-    'Melee Force': { role: 'Melee Force', gSuccess: mel.gSuccess, gDouble: mel.gDouble, actionDuration: 9.35, statYield: mel.statYield, expectedItemsFinished: mel.expectedItems, maxStatYield: mel.maxStatYield, statValuePerItem: mel.statValuePerItem },
-    'Range Force': { role: 'Range Force', gSuccess: rng.gSuccess, gDouble: rng.gDouble, actionDuration: 9.35, statYield: rng.statYield, expectedItemsFinished: rng.expectedItems, maxStatYield: rng.maxStatYield, statValuePerItem: rng.statValuePerItem },
-    'Magic Force': { role: 'Magic Force', gSuccess: mag.gSuccess, gDouble: mag.gDouble, actionDuration: 9.35, statYield: mag.statYield, expectedItemsFinished: mag.expectedItems, maxStatYield: mag.maxStatYield, statValuePerItem: mag.statValuePerItem },
-    'Defense': { role: 'Defense', gSuccess: def.gSuccess, gDouble: def.gDouble, actionDuration: 9.35, statYield: def.statYield, expectedItemsFinished: def.expectedItems, maxStatYield: def.maxStatYield, statValuePerItem: def.statValuePerItem }
+    'Health': { role: 'Health', gatherSkill: 'fish', gatherLevel: getVal('fish'), gSuccess: h.gSuccess, gDouble: h.gDouble, gatherActionTime: h.gatherActionTime, processSkill: 'cook', processLevel: getVal('cook'), pSuccess: h.pSuccess, pSave: h.pSave, processActionTime: h.processActionTime, walkDistance: h.walkDistance || 610, statYield: h.statYield, expectedItemsFinished: h.expectedItems, maxStatYield: h.maxStatYield, statValuePerItem: h.statValuePerItem },
+    'Melee Force': { role: 'Melee Force', gatherSkill: 'mine', gatherLevel: getVal('mine'), gSuccess: mel.gSuccess, gDouble: mel.gDouble, gatherActionTime: mel.gatherActionTime, processSkill: 'smith', processLevel: getVal('smith'), pSuccess: mel.pSuccess, pSave: mel.pSave, processActionTime: mel.processActionTime, walkDistance: mel.walkDistance || 610, statYield: mel.statYield, expectedItemsFinished: mel.expectedItems, maxStatYield: mel.maxStatYield, statValuePerItem: mel.statValuePerItem },
+    'Range Force': { role: 'Range Force', gatherSkill: 'forage', gatherLevel: getVal('forage'), gSuccess: rng.gSuccess, gDouble: rng.gDouble, gatherActionTime: rng.gatherActionTime, processSkill: 'craft', processLevel: getVal('craft'), pSuccess: rng.pSuccess, pSave: rng.pSave, processActionTime: rng.processActionTime, walkDistance: rng.walkDistance || 610, statYield: rng.statYield, expectedItemsFinished: rng.expectedItems, maxStatYield: rng.maxStatYield, statValuePerItem: rng.statValuePerItem },
+    'Magic Force': { role: 'Magic Force', gatherSkill: 'invoke', gatherLevel: getVal('invoke'), gSuccess: mag.gSuccess, gDouble: mag.gDouble, gatherActionTime: mag.gatherActionTime, processSkill: 'imbue', processLevel: getVal('imbue'), pSuccess: mag.pSuccess, pSave: mag.pSave, processActionTime: mag.processActionTime, walkDistance: mag.walkDistance || 610, statYield: mag.statYield, expectedItemsFinished: mag.expectedItems, maxStatYield: mag.maxStatYield, statValuePerItem: mag.statValuePerItem },
+    'Defense': { role: 'Defense', gatherSkill: 'farm', gatherLevel: getVal('farm'), gSuccess: def.gSuccess, gDouble: def.gDouble, gatherActionTime: def.gatherActionTime, processSkill: 'brew', processLevel: getVal('brew'), pSuccess: def.pSuccess, pSave: def.pSave, processActionTime: def.processActionTime, walkDistance: def.walkDistance || 610, statYield: def.statYield, expectedItemsFinished: def.expectedItems, maxStatYield: def.maxStatYield, statValuePerItem: def.statValuePerItem }
   };
 
   const partySize = parseInt(document.getElementById('selPartySize').value, 10);
