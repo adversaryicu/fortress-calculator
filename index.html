@@ -996,6 +996,7 @@
         <div class="stat-row"><span>Wipe Reason</span><span id="optWipeReason">Health Depleted (8.0 mins)</span></div>
         <div class="stat-row"><span>Final Army HP</span><span style="color: var(--success);" id="optHp">533 HP</span></div>
         <div class="stat-row"><span>Total Force (Mel+Rng+Mag)</span><span id="optForce">510 Force</span></div>
+        <div class="stat-row"><span>Defense Stat</span><span id="optDef">--</span></div>
       </div>
     </div>
   </div>
@@ -1271,7 +1272,8 @@ function showEmptyState() {
   document.getElementById('optWipeReason').textContent = '--';
   document.getElementById('optHp').textContent = '--';
   document.getElementById('optForce').textContent = '--';
-  document.getElementById('optDef').textContent = '--';
+  const elOptDef = document.getElementById('optDef');
+  if (elOptDef) elOptDef.textContent = '--';
   document.getElementById('tblUpgradeRoi').innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px;">Paste audit data and run simulation to view upgrade recommendations.</td></tr>';
   document.getElementById('tblWaveTimeline').innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px;">Paste audit data and run simulation to view wave timeline.</td></tr>';
   const tblParty = document.getElementById('tblPartyContribution');
@@ -1743,16 +1745,29 @@ function runFullOptimizer() {
   document.getElementById('optWipeReason').textContent = `${best.res.wipeReason} (${(best.res.wipeTime / 60).toFixed(1)} mins)`;
   document.getElementById('optHp').textContent = `${best.res.finalArmy.health.toFixed(0)} HP`;
   document.getElementById('optForce').textContent = `${(best.res.finalArmy.melee + best.res.finalArmy.range + best.res.finalArmy.magic).toFixed(0)} Force`;
-  document.getElementById('optDef').textContent = `${best.res.finalArmy.defense.toFixed(0)} Defense`;
+  const elOptDef = document.getElementById('optDef');
+  if (elOptDef) elOptDef.textContent = `${best.res.finalArmy.defense.toFixed(0)} Defense`;
 
   // Render Upgrade Sensitivity & Roadmap
-  renderUpgradeAnalysis(partySize, hostSpeed, cloneSpeed, bag, best.res.survivedWaves);
+  try {
+    renderUpgradeAnalysis(partySize, hostSpeed, cloneSpeed, bag, best.res.survivedWaves);
+  } catch (err) {
+    console.error("renderUpgradeAnalysis failed:", err);
+  }
 
   // Render Party Delivery & Personal Contribution Breakdown
-  renderPartyContribution(best.res.players);
+  try {
+    renderPartyContribution(best.res.players);
+  } catch (err) {
+    console.error("renderPartyContribution failed:", err);
+  }
 
   // Render Wave Timeline
-  renderWaveTimeline(best.res.waveLog, best.res.wipeWave, best.res.wipeReason);
+  try {
+    renderWaveTimeline(best.res.waveLog, best.res.wipeWave, best.res.wipeReason);
+  } catch (err) {
+    console.error("renderWaveTimeline failed:", err);
+  }
 }
 
 function renderRolePills(elementId, compList) {
@@ -1779,116 +1794,164 @@ function renderRolePills(elementId, compList) {
 
 // Sensitivity Analysis & Skill Recommendation
 function renderUpgradeAnalysis(partySize, hostSpeed, cloneSpeed, bag, baselineWaves) {
-  const skillsConfig = [
-    { role: 'Magic Force', gather: 'invoke', process: 'imbue', stat: 'Magic' },
-    { role: 'Health', gather: 'fish', process: 'cook', stat: 'Health' },
-    { role: 'Melee Force', gather: 'mine', process: 'smith', stat: 'Melee' },
-    { role: 'Range Force', gather: 'forage', process: 'craft', stat: 'Range' },
-    { role: 'Defense', gather: 'farm', process: 'brew', stat: 'Defense' }
-  ];
+  try {
+    const skillsConfig = [
+      { role: 'Magic Force', gather: 'invoke', process: 'imbue', stat: 'Magic' },
+      { role: 'Health', gather: 'fish', process: 'cook', stat: 'Health' },
+      { role: 'Melee Force', gather: 'mine', process: 'smith', stat: 'Melee' },
+      { role: 'Range Force', gather: 'forage', process: 'craft', stat: 'Range' },
+      { role: 'Defense', gather: 'farm', process: 'brew', stat: 'Defense' }
+    ];
 
-  const analysisRows = [];
+    const analysisRows = [];
 
-  skillsConfig.forEach(sc => {
-    // Determine current level from audit
-    let gLvl = 10, pLvl = 10;
-    let match = null;
-    if (currentAudit.roles) {
-      match = currentAudit.roles.find(r => r.role === sc.role);
-      if (match) {
-        gLvl = match.gatherLevel;
-        pLvl = match.processLevel;
+    skillsConfig.forEach(sc => {
+      // Determine current level from activeRoleStats (reflecting sandbox) or audit
+      let gLvl = 10, pLvl = 10;
+      let match = null;
+      if (activeRoleStats[sc.role] && activeRoleStats[sc.role].gatherLevel !== undefined) {
+        gLvl = Number(activeRoleStats[sc.role].gatherLevel) || 10;
+        pLvl = Number(activeRoleStats[sc.role].processLevel) || 10;
+        if (Array.isArray(currentAudit.roles)) match = currentAudit.roles.find(r => r.role === sc.role);
+      } else if (Array.isArray(currentAudit.roles)) {
+        match = currentAudit.roles.find(r => r.role === sc.role);
+        if (match) {
+          gLvl = Number(match.gatherLevel) || 10;
+          pLvl = Number(match.processLevel) || 10;
+        }
+      } else if (currentAudit.skills) {
+        if (currentAudit.skills[sc.gather] && currentAudit.skills[sc.gather].level) gLvl = currentAudit.skills[sc.gather].level;
+        if (currentAudit.skills[sc.process] && currentAudit.skills[sc.process].level) pLvl = currentAudit.skills[sc.process].level;
+      }
+
+      const curYieldObj = computeRoleYield(sc.gather, gLvl, sc.process, pLvl, bag, match);
+      const curTier = curYieldObj.tier;
+      const nextTierReq = (curTier + 1) * 10;
+
+      // Identify the bottleneck skill and target levels
+      let bottleneckSkill, targetLvl, newGLvl, newPLvl, targetDesc;
+      if (gLvl < pLvl) {
+        bottleneckSkill = sc.gather;
+        targetLvl = Math.max(pLvl, nextTierReq);
+        newGLvl = targetLvl;
+        newPLvl = Math.max(pLvl, nextTierReq);
+        targetDesc = `${sc.gather.toUpperCase()} (${gLvl} \u2192 ${targetLvl})`;
+      } else if (pLvl < gLvl) {
+        bottleneckSkill = sc.process;
+        targetLvl = Math.max(gLvl, nextTierReq);
+        newGLvl = Math.max(gLvl, nextTierReq);
+        newPLvl = targetLvl;
+        targetDesc = `${sc.process.toUpperCase()} (${pLvl} \u2192 ${targetLvl})`;
+      } else {
+        bottleneckSkill = `${sc.gather} & ${sc.process}`;
+        targetLvl = nextTierReq;
+        newGLvl = nextTierReq;
+        newPLvl = nextTierReq;
+        targetDesc = `Pair to Lv ${nextTierReq}`;
+      }
+
+      const upYieldObj = computeRoleYield(sc.gather, newGLvl, sc.process, newPLvl, bag, match);
+
+      // Simulate scenario with this role upgraded
+      const testMap = { ...activeRoleStats };
+      testMap[sc.role] = {
+        role: sc.role,
+        gatherSkill: sc.gather,
+        gatherLevel: newGLvl,
+        gSuccess: upYieldObj.gSuccess,
+        gDouble: upYieldObj.gDouble,
+        gatherActionTime: upYieldObj.gatherActionTime,
+        processSkill: sc.process,
+        processLevel: newPLvl,
+        pSuccess: upYieldObj.pSuccess,
+        pSave: upYieldObj.pSave,
+        processActionTime: upYieldObj.processActionTime,
+        walkDistance: upYieldObj.walkDistance || 610,
+        statYield: upYieldObj.statYield,
+        expectedItemsFinished: upYieldObj.expectedItems,
+        maxStatYield: upYieldObj.maxStatYield,
+        statValuePerItem: upYieldObj.statValuePerItem
+      };
+
+      const optResult = findOptimalComposition(testMap, partySize, hostSpeed, cloneSpeed, bag);
+      const waveGain = Math.max(0, optResult.best.res.survivedWaves - baselineWaves);
+      const yieldGainPct = curYieldObj.statYield > 0
+        ? ((upYieldObj.statYield - curYieldObj.statYield) / curYieldObj.statYield * 100).toFixed(1)
+        : '0.0';
+
+      analysisRows.push({
+        role: sc.role,
+        gather: sc.gather,
+        process: sc.process,
+        gLvl,
+        pLvl,
+        curTier,
+        nextTierReq,
+        bottleneckSkill,
+        targetLvl,
+        targetDesc,
+        yieldGainPct,
+        curYield: curYieldObj.statYield,
+        upYield: upYieldObj.statYield,
+        waveGain,
+        newWaves: optResult.best.res.survivedWaves
+      });
+    });
+
+    // Sort by wave gain descending, then yieldGainPct descending
+    analysisRows.sort((a, b) => (b.waveGain - a.waveGain) || (parseFloat(b.yieldGainPct) - parseFloat(a.yieldGainPct)));
+
+    const top = analysisRows[0];
+    if (top) {
+      const elFocusTitle = document.getElementById('focusSkillTitle');
+      const elFocusDesc = document.getElementById('focusDesc');
+      const elBottleTitle = document.getElementById('resBottleneckTitle');
+      const elBottleSub = document.getElementById('resBottleneckSub');
+
+      if (elFocusTitle) {
+        elFocusTitle.textContent = `Level ${top.targetDesc}`;
+      }
+      if (elFocusDesc) {
+        const roleBonusText = top.waveGain > 0
+          ? `powers the army through <strong>Wave ${top.newWaves}</strong> (+${top.waveGain} waves over current baseline)!`
+          : `increases total stat output by <strong>+${top.yieldGainPct}%</strong> per run cycle.`;
+        elFocusDesc.innerHTML = `
+          <strong>${top.targetDesc}</strong> is currently the primary efficiency breakpoint for <strong>${top.role}</strong>.
+          Advancing to <strong>Tier ${top.curTier + 1}</strong> boosts deposit stat yield from <strong>${top.curYield} &rarr; ${top.upYield} (+${top.yieldGainPct}%)</strong>.
+          This upgrade ${roleBonusText}
+        `;
+      }
+      if (elBottleTitle) {
+        elBottleTitle.textContent = `${top.targetDesc} (T${top.curTier})`;
+      }
+      if (elBottleSub) {
+        elBottleSub.textContent = `Unlocks T${top.curTier + 1} at Lv ${top.targetLvl} (+${top.yieldGainPct}% yield)`;
       }
     }
 
-    const curYieldObj = computeRoleYield(sc.gather, gLvl, sc.process, pLvl, bag, match);
-    const curTier = curYieldObj.tier;
-    const nextTierReq = (curTier + 1) * 10;
+    const tbody = document.getElementById('tblUpgradeRoi');
+    if (tbody) {
+      tbody.innerHTML = '';
+      analysisRows.forEach((r, idx) => {
+        const tr = document.createElement('tr');
+        const priorityClass = idx === 0 ? 'high' : (r.waveGain > 0 ? 'med' : 'low');
+        const priorityText = idx === 0 ? 'Top Pick \u2605' : (r.waveGain > 0 ? 'High' : 'Moderate');
 
-    // Test upgrading the lagging skill to next tier breakpoint
-    const bottleneckSkill = gLvl <= pLvl ? sc.gather : sc.process;
-    const newGLvl = gLvl <= pLvl ? nextTierReq : gLvl;
-    const newPLvl = pLvl < gLvl ? nextTierReq : (gLvl <= pLvl ? pLvl : nextTierReq);
-
-    const upYieldObj = computeRoleYield(sc.gather, newGLvl, sc.process, newPLvl, bag, match);
-
-    // Simulate scenario with this role upgraded
-    const testMap = { ...activeRoleStats };
-    testMap[sc.role] = {
-      role: sc.role,
-      gatherSkill: sc.gather,
-      gatherLevel: newGLvl,
-      gSuccess: upYieldObj.gSuccess,
-      gDouble: upYieldObj.gDouble,
-      gatherActionTime: upYieldObj.gatherActionTime,
-      processSkill: sc.process,
-      processLevel: newPLvl,
-      pSuccess: upYieldObj.pSuccess,
-      pSave: upYieldObj.pSave,
-      processActionTime: upYieldObj.processActionTime,
-      walkDistance: upYieldObj.walkDistance || 610,
-      statYield: upYieldObj.statYield,
-      expectedItemsFinished: upYieldObj.expectedItems,
-      maxStatYield: upYieldObj.maxStatYield,
-      statValuePerItem: upYieldObj.statValuePerItem
-    };
-
-    const optResult = findOptimalComposition(testMap, partySize, hostSpeed, cloneSpeed, bag);
-    const waveGain = optResult.best.res.survivedWaves - baselineWaves;
-    const yieldGainPct = ((upYieldObj.statYield - curYieldObj.statYield) / curYieldObj.statYield * 100).toFixed(1);
-
-    analysisRows.push({
-      role: sc.role,
-      gather: sc.gather,
-      process: sc.process,
-      gLvl,
-      pLvl,
-      curTier,
-      nextTierReq,
-      bottleneckSkill,
-      targetLvl: nextTierReq,
-      yieldGainPct,
-      curYield: curYieldObj.statYield,
-      upYield: upYieldObj.statYield,
-      waveGain,
-      newWaves: optResult.best.res.survivedWaves
-    });
-  });
-
-  // Sort by wave gain descending, then yieldGainPct descending
-  analysisRows.sort((a, b) => (b.waveGain - a.waveGain) || (b.yieldGainPct - a.yieldGainPct));
-
-  const top = analysisRows[0];
-  if (top) {
-    document.getElementById('focusSkillTitle').textContent = `Level ${top.bottleneckSkill.toUpperCase()} (${Math.min(top.gLvl, top.pLvl)} \u2192 ${top.targetLvl})`;
-    document.getElementById('focusDesc').innerHTML = `
-      <strong>${top.bottleneckSkill.toUpperCase()}</strong> is currently the primary bottleneck for <strong>${top.role}</strong>.
-      Pushing it from Level ${Math.min(top.gLvl, top.pLvl)} to ${top.targetLvl} unlocks <strong>Tier ${top.curTier + 1}</strong>,
-      boosting deposit stat yield from <strong>${top.curYield} &rarr; ${top.upYield} (+${top.yieldGainPct}%)</strong>.
-      This immediately powers the army through <strong>Wave ${top.newWaves}</strong> (+${top.waveGain} waves over current baseline)!
-    `;
-    document.getElementById('resBottleneckTitle').textContent = `${top.bottleneckSkill.toUpperCase()} T${top.curTier} (Lv ${Math.min(top.gLvl, top.pLvl)})`;
-    document.getElementById('resBottleneckSub').textContent = `Unlocks T${top.curTier + 1} at Lv ${top.targetLvl} (+${top.yieldGainPct}%)`;
+        tr.innerHTML = `
+          <td><strong>${r.role}</strong> <span style="color:var(--text-muted);font-size:11px;">(${r.gather} / ${r.process})</span></td>
+          <td>${r.gather} ${r.gLvl} / ${r.process} ${r.pLvl}</td>
+          <td><strong>${r.targetDesc}</strong></td>
+          <td>T${r.curTier} &rarr; T${r.curTier + 1}</td>
+          <td>${r.curYield} &rarr; <strong>${r.upYield}</strong> <span style="color:var(--success);font-size:11px;">(+${r.yieldGainPct}%)</span></td>
+          <td><strong style="color:var(--accent);">${r.waveGain > 0 ? '+' + r.waveGain : '+0'} Waves</strong> (Wave ${r.newWaves})</td>
+          <td><span class="badge-roi ${priorityClass}">${priorityText}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  } catch (err) {
+    console.error("renderUpgradeAnalysis failed:", err);
   }
-
-  const tbody = document.getElementById('tblUpgradeRoi');
-  tbody.innerHTML = '';
-  analysisRows.forEach((r, idx) => {
-    const tr = document.createElement('tr');
-    const priorityClass = idx === 0 ? 'high' : (r.waveGain > 0 ? 'med' : 'low');
-    const priorityText = idx === 0 ? 'Top Pick \u2605' : (r.waveGain > 0 ? 'High' : 'Moderate');
-
-    tr.innerHTML = `
-      <td><strong>${r.role}</strong> <span style="color:var(--text-muted);font-size:11px;">(${r.gather} / ${r.process})</span></td>
-      <td>${r.gather} ${r.gLvl} / ${r.process} ${r.pLvl}</td>
-      <td><strong>${r.bottleneckSkill} &rarr; ${r.targetLvl}</strong></td>
-      <td>T${r.curTier} &rarr; T${r.curTier + 1}</td>
-      <td>${r.curYield} &rarr; <strong>${r.upYield}</strong> <span style="color:var(--success);font-size:11px;">(+${r.yieldGainPct}%)</span></td>
-      <td><strong style="color:var(--accent);">${r.waveGain > 0 ? '+' + r.waveGain : '+0'} Waves</strong> (Wave ${r.newWaves})</td>
-      <td><span class="badge-roi ${priorityClass}">${priorityText}</span></td>
-    `;
-    tbody.appendChild(tr);
-  });
 }
 
 // Wave progression timeline rendering
@@ -2044,11 +2107,26 @@ function applySandboxAndRun() {
   document.getElementById('optWipeReason').textContent = `${best.res.wipeReason} (${(best.res.wipeTime / 60).toFixed(1)} mins)`;
   document.getElementById('optHp').textContent = `${best.res.finalArmy.health.toFixed(0)} HP`;
   document.getElementById('optForce').textContent = `${(best.res.finalArmy.melee + best.res.finalArmy.range + best.res.finalArmy.magic).toFixed(0)} Force`;
-  document.getElementById('optDef').textContent = `${best.res.finalArmy.defense.toFixed(0)} Defense`;
+  const elOptDef = document.getElementById('optDef');
+  if (elOptDef) elOptDef.textContent = `${best.res.finalArmy.defense.toFixed(0)} Defense`;
 
-  renderUpgradeAnalysis(partySize, hostSpeed, cloneSpeed, bag, best.res.survivedWaves);
-  renderPartyContribution(best.res.players);
-  renderWaveTimeline(best.res.waveLog, best.res.wipeWave, best.res.wipeReason);
+  try {
+    renderUpgradeAnalysis(partySize, hostSpeed, cloneSpeed, bag, best.res.survivedWaves);
+  } catch (err) {
+    console.error("Sandbox renderUpgradeAnalysis failed:", err);
+  }
+
+  try {
+    renderPartyContribution(best.res.players);
+  } catch (err) {
+    console.error("Sandbox renderPartyContribution failed:", err);
+  }
+
+  try {
+    renderWaveTimeline(best.res.waveLog, best.res.wipeWave, best.res.wipeReason);
+  } catch (err) {
+    console.error("Sandbox renderWaveTimeline failed:", err);
+  }
 }
 
 // Party Delivery & Personal Contribution Breakdown rendering
