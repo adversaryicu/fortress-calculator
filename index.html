@@ -609,15 +609,103 @@
     const bagSize = (typeof Constants !== 'undefined' && Constants.INVENTORY_SLOTS ? Constants.INVENTORY_SLOTS : 28) 
         + satchelCount * (typeof Constants !== 'undefined' && Constants.SATCHEL_SLOTS_PER ? Constants.SATCHEL_SLOTS_PER : 4);
 
-    const hostMove = typeof ClientState.movementSpeed === 'number' ? ClientState.movementSpeed : 13.2;
-    const cloneMove = typeof ClientState.cloneMovementSpeed === 'number' ? ClientState.cloneMovementSpeed : Number((hostMove * 0.9).toFixed(1));
+    const calcLiveMovementSpeed = () => {
+        const vigorLevel = (ClientState.skills && ClientState.skills.vigor && ClientState.skills.vigor.level) || 1;
+        let vigorEffLevel = vigorLevel;
+        if (typeof EffectiveLevel !== 'undefined' && typeof EffectiveLevel.compute === 'function') {
+            try {
+                const vigorEff = EffectiveLevel.compute({
+                    level: vigorLevel,
+                    pets: ClientState.pets,
+                    capes: ClientState.capes,
+                    tools: ClientState.unlocks && ClientState.unlocks.tools
+                });
+                if (vigorEff && vigorEff.effective) vigorEffLevel = vigorEff.effective;
+            } catch(e) {}
+        }
+
+        const unl = ClientState.unlocks || {};
+        const relics = unl.relics || {};
+        let telBonus = 0;
+        const telPer = (typeof Constants !== 'undefined' && Constants.TELESCOPE_MOVE_SPEED_BONUS_PER) || 0.005;
+        const telShinyPer = (typeof Constants !== 'undefined' && Constants.TELESCOPE_SHINY_MOVE_SPEED_BONUS_PER) || 0.01;
+        for (let t = 0; t <= 10; t++) {
+            if (relics['telescope_t' + t]) telBonus += telPer;
+            if (relics['shiny_telescope_t' + t]) telBonus += telShinyPer;
+        }
+
+        const beacons = unl.beacons || {};
+        let beaconBonus = 0;
+        const bTiers = (typeof Constants !== 'undefined' && Constants.GAUNTLET_RARE_TIER_KEYS) || ['feeble','dire','savage','fell','ancient','chaos','cataclysm'];
+        for (let b = 0; b < bTiers.length; b++) {
+            if (beacons['beacon_swift_' + bTiers[b]]) {
+                beaconBonus += (typeof Constants !== 'undefined' && typeof Constants.swiftBeaconMoveBonus === 'function')
+                    ? Constants.swiftBeaconMoveBonus(b) : 0.01 * (b + 1);
+            }
+        }
+
+        const compasses = unl.compasses || {};
+        let compassCount = 0;
+        for (let c = 0; c <= 10; c++) {
+            if (compasses['enchanted_compass_t' + c]) compassCount++;
+        }
+        const compassBonus = compassCount * ((typeof Constants !== 'undefined' && Constants.COMPASS_MOVE_SPEED_BONUS_PER) || 0.005);
+
+        let gauntBonus = 0;
+        const banners = unl.banners || {};
+        const ledgers = unl.ledgers || {};
+        for (let g = 0; g < bTiers.length; g++) {
+            if (typeof Constants !== 'undefined' && typeof Constants.gauntletMilestoneMoveBonus === 'function') {
+                if (banners['gauntlet_banner_' + bTiers[g]]) gauntBonus += Constants.gauntletMilestoneMoveBonus(g);
+                if (ledgers['gauntlet_ledger_' + bTiers[g]]) gauntBonus += Constants.gauntletMilestoneMoveBonus(g);
+            }
+        }
+
+        let talentBonus = 0;
+        if (window.RaidTreeEffects && ClientState.raidTrees) {
+            try {
+                const mte = window.RaidTreeEffects.sumEffects({
+                    delve: [],
+                    fortify: (ClientState.raidTrees.fortify && ClientState.raidTrees.fortify.allocated) || []
+                });
+                talentBonus = (mte && mte.moveSpeedPct ? mte.moveSpeedPct / 100 : 0);
+            } catch(e) {}
+        }
+
+        const collectorBonus = ((typeof ClientState.getCollectorProgress === 'function' ? ClientState.getCollectorProgress() : 0)
+            * ((typeof Constants !== 'undefined' && Constants.COLLECTOR_MAX_MOVE_SPEED) || 0.05));
+        const ancientBonus = typeof ClientState.getShardSetMoveSpeedBonus === 'function' ? ClientState.getShardSetMoveSpeedBonus() : 0;
+
+        const mvOpts = {
+            vigorLevel: vigorEffLevel,
+            telescope: telBonus,
+            compass: compassBonus,
+            gauntlet: gauntBonus,
+            beacon: beaconBonus,
+            collector: collectorBonus,
+            ancient: ancientBonus,
+            talent: talentBonus
+        };
+
+        if (typeof Constants !== 'undefined' && typeof Constants.totalMovementSpeed === 'function') {
+            return Number(Constants.totalMovementSpeed(mvOpts).toFixed(1));
+        }
+        if (typeof Constants !== 'undefined' && typeof Constants.movementSpeed === 'function') {
+            return Number(Constants.movementSpeed(vigorEffLevel).toFixed(1));
+        }
+        return Number((10 + (vigorEffLevel + 1) * (0.1 + 0.0005 * vigorEffLevel)).toFixed(1));
+    };
+
+    const hostSpeed = calcLiveMovementSpeed();
+    const cloneMult = (typeof Constants !== 'undefined' && Constants.GAUNTLET_CLONE_MOVE_MULT) ? Constants.GAUNTLET_CLONE_MOVE_MULT : 0.9;
+    const cloneSpeed = Number((hostSpeed * cloneMult).toFixed(1));
 
     const report = {
         player: ClientState.playerName || 'Player',
         partySize: 5,
         bagCapacity: bagSize,
-        hostSpeed: Number(hostMove.toFixed(1)),
-        cloneSpeed: Number(cloneMove.toFixed(1)),
+        hostSpeed: hostSpeed,
+        cloneSpeed: cloneSpeed,
         skills: ClientState.skills,
         roles: []
     };
@@ -673,7 +761,7 @@
     // 2. Try DevTools native copy() command
     try {
         if (typeof copy === 'function') {
-            copy(report);
+            copy(jsonText);
             copied = true;
         }
     } catch (e) {}
@@ -847,9 +935,34 @@
         <div class="stat-row"><span>Wipe Reason</span><span id="optWipeReason">Health Depleted (8.0 mins)</span></div>
         <div class="stat-row"><span>Final Army HP</span><span style="color: var(--success);" id="optHp">533 HP</span></div>
         <div class="stat-row"><span>Total Force (Mel+Rng+Mag)</span><span id="optForce">510 Force</span></div>
-        <div class="stat-row"><span>Defense Stat</span><span id="optDef">10 Defense</span></div>
       </div>
     </div>
+  </div>
+
+  <!-- Party Delivery & Personal Contribution Breakdown -->
+  <div class="card" style="margin-bottom: 24px;">
+    <div class="card-title">
+      <span>Party Delivery & Personal Contribution Breakdown</span>
+      <span style="font-size: 12px; color: var(--text-muted);">Exact Run Deliveries & Army Impact for Optimal Composition</span>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Party Member</th>
+          <th>Assigned Role</th>
+          <th>Trip Time</th>
+          <th>Completed Trips</th>
+          <th>Single-Trip Yield</th>
+          <th>Finished Items Delivered</th>
+          <th>Total Stat Delivered</th>
+          <th>Team Output Share</th>
+        </tr>
+      </thead>
+      <tbody id="tblPartyContribution">
+        <!-- Injected via JS -->
+      </tbody>
+    </table>
   </div>
 
   <!-- Skill ROI & Upgrade Sensitivity Table -->
@@ -1100,6 +1213,10 @@ function showEmptyState() {
   document.getElementById('optDef').textContent = '--';
   document.getElementById('tblUpgradeRoi').innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px;">Paste audit data and run simulation to view upgrade recommendations.</td></tr>';
   document.getElementById('tblWaveTimeline').innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px;">Paste audit data and run simulation to view wave timeline.</td></tr>';
+  const tblParty = document.getElementById('tblPartyContribution');
+  if (tblParty) {
+    tblParty.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:24px;">Paste audit data and run simulation to view party delivery breakdown.</td></tr>';
+  }
 }
 
 function onJsonInputChanged() {
@@ -1144,11 +1261,35 @@ function init() {
 
 function copyConsoleScript() {
   const code = document.getElementById('consoleSnippet').innerText;
-  navigator.clipboard.writeText(code).then(() => {
+  const updateBtn = () => {
     const copyText = document.getElementById('copyText');
-    copyText.textContent = 'Copied!';
-    setTimeout(() => { copyText.textContent = 'Copy Script'; }, 2000);
-  });
+    if (copyText) {
+      copyText.textContent = 'Copied!';
+      setTimeout(() => { copyText.textContent = 'Copy Script'; }, 2000);
+    }
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(updateBtn).catch(() => {
+      fallbackCopy(code, updateBtn);
+    });
+  } else {
+    fallbackCopy(code, updateBtn);
+  }
+}
+
+function fallbackCopy(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    document.execCommand('copy');
+    if (cb) cb();
+  } catch (e) {}
+  document.body.removeChild(ta);
 }
 
 // Compute role yield dynamically given levels and bag size
@@ -1176,7 +1317,9 @@ function computeRoleYield(gatherSkill, gatherLvl, processSkill, processLvl, bagS
     tierVal,
     expectedItems,
     statYield: expectedStat,
-    actionDuration: 9.35
+    actionDuration: 9.35,
+    maxStatYield: bagSize * tierVal,
+    statValuePerItem: tierVal
   };
 }
 
@@ -1313,7 +1456,8 @@ function simulateCombat(party, runSeed = 12345) {
     wipeReason: wipeReason || 'MAX DURATION CLEARED',
     wipeTime: wipeTime || time,
     finalArmy: army,
-    waveLog: waveLog
+    waveLog: waveLog,
+    players: players
   };
 }
 
@@ -1341,7 +1485,7 @@ function findOptimalComposition(roleMap, partySize = 5, hostSpeed = 13.2, cloneS
   roleNames.forEach(hostRole => {
     cloneCombos.forEach(clones => {
       const party = [
-        { name: 'Host', speed: hostSpeed, bag, role: hostRole, ...roleMap[hostRole] }
+        { name: 'Host (You)', speed: hostSpeed, bag, role: hostRole, ...roleMap[hostRole] }
       ];
       clones.forEach((cRole, idx) => {
         party.push({ name: 'Clone ' + (idx + 1), speed: cloneSpeed, bag, role: cRole, ...roleMap[cRole] });
@@ -1352,7 +1496,7 @@ function findOptimalComposition(roleMap, partySize = 5, hostSpeed = 13.2, cloneS
 
       const isStd = partySize === 5 && fullComp.join(',') === 'Health,Melee Force,Range Force,Magic Force,Defense';
       if (isStd) {
-        standardRes = { comp: fullComp, res };
+        standardRes = { comp: fullComp, res, party };
       }
 
       if (!best || res.survivedWaves > best.res.survivedWaves ||
@@ -1414,22 +1558,34 @@ function runFullOptimizer() {
         gSuccess: r.gatherSuccessPct || 75,
         gDouble: r.gatherDoublePct || 0.8,
         actionDuration: 9.35,
-        statYield: r.expectedStatYield || 60
+        statYield: r.expectedStatYield || 60,
+        expectedItemsFinished: r.expectedItemsFinished || (r.expectedStatYield ? Number((r.expectedStatYield / (r.statValuePerItem || 3)).toFixed(1)) : 20),
+        maxStatYield: r.maxStatYield || (r.bagCapacity ? r.bagCapacity * (r.statValuePerItem || 3) : 84),
+        statValuePerItem: r.statValuePerItem || 3
       };
     });
   }
 
   // Ensure all 5 roles exist with fallback
   const fallbackRoles = [
-    { role: 'Health', g: 78.8, y: 65.4 },
-    { role: 'Melee Force', g: 71.8, y: 60.3 },
-    { role: 'Range Force', g: 78.8, y: 59.7 },
-    { role: 'Magic Force', g: 79.8, y: 43.6 },
-    { role: 'Defense', g: 77.8, y: 60.3 }
+    { role: 'Health', g: 78.8, y: 65.4, items: 21.8, max: 84, val: 3 },
+    { role: 'Melee Force', g: 71.8, y: 60.3, items: 20.1, max: 84, val: 3 },
+    { role: 'Range Force', g: 78.8, y: 59.7, items: 19.9, max: 84, val: 3 },
+    { role: 'Magic Force', g: 79.8, y: 43.6, items: 21.8, max: 56, val: 2 },
+    { role: 'Defense', g: 77.8, y: 60.3, items: 20.1, max: 84, val: 3 }
   ];
   fallbackRoles.forEach(fb => {
     if (!activeRoleStats[fb.role]) {
-      activeRoleStats[fb.role] = { role: fb.role, gSuccess: fb.g, gDouble: 0.8, actionDuration: 9.35, statYield: fb.y };
+      activeRoleStats[fb.role] = {
+        role: fb.role,
+        gSuccess: fb.g,
+        gDouble: 0.8,
+        actionDuration: 9.35,
+        statYield: fb.y,
+        expectedItemsFinished: fb.items,
+        maxStatYield: fb.max,
+        statValuePerItem: fb.val
+      };
     }
   });
 
@@ -1477,6 +1633,9 @@ function runFullOptimizer() {
 
   // Render Upgrade Sensitivity & Roadmap
   renderUpgradeAnalysis(partySize, hostSpeed, cloneSpeed, bag, best.res.survivedWaves);
+
+  // Render Party Delivery & Personal Contribution Breakdown
+  renderPartyContribution(best.res.players);
 
   // Render Wave Timeline
   renderWaveTimeline(best.res.waveLog, best.res.wipeWave, best.res.wipeReason);
@@ -1712,11 +1871,11 @@ function applySandboxAndRun() {
   const def = computeRoleYield('farm', getVal('farm'), 'brew', getVal('brew'), bag);
 
   activeRoleStats = {
-    'Health': { role: 'Health', gSuccess: h.gSuccess, gDouble: h.gDouble, actionDuration: 9.35, statYield: h.statYield },
-    'Melee Force': { role: 'Melee Force', gSuccess: mel.gSuccess, gDouble: mel.gDouble, actionDuration: 9.35, statYield: mel.statYield },
-    'Range Force': { role: 'Range Force', gSuccess: rng.gSuccess, gDouble: rng.gDouble, actionDuration: 9.35, statYield: rng.statYield },
-    'Magic Force': { role: 'Magic Force', gSuccess: mag.gSuccess, gDouble: mag.gDouble, actionDuration: 9.35, statYield: mag.statYield },
-    'Defense': { role: 'Defense', gSuccess: def.gSuccess, gDouble: def.gDouble, actionDuration: 9.35, statYield: def.statYield }
+    'Health': { role: 'Health', gSuccess: h.gSuccess, gDouble: h.gDouble, actionDuration: 9.35, statYield: h.statYield, expectedItemsFinished: h.expectedItems, maxStatYield: h.maxStatYield, statValuePerItem: h.statValuePerItem },
+    'Melee Force': { role: 'Melee Force', gSuccess: mel.gSuccess, gDouble: mel.gDouble, actionDuration: 9.35, statYield: mel.statYield, expectedItemsFinished: mel.expectedItems, maxStatYield: mel.maxStatYield, statValuePerItem: mel.statValuePerItem },
+    'Range Force': { role: 'Range Force', gSuccess: rng.gSuccess, gDouble: rng.gDouble, actionDuration: 9.35, statYield: rng.statYield, expectedItemsFinished: rng.expectedItems, maxStatYield: rng.maxStatYield, statValuePerItem: rng.statValuePerItem },
+    'Magic Force': { role: 'Magic Force', gSuccess: mag.gSuccess, gDouble: mag.gDouble, actionDuration: 9.35, statYield: mag.statYield, expectedItemsFinished: mag.expectedItems, maxStatYield: mag.maxStatYield, statValuePerItem: mag.statValuePerItem },
+    'Defense': { role: 'Defense', gSuccess: def.gSuccess, gDouble: def.gDouble, actionDuration: 9.35, statYield: def.statYield, expectedItemsFinished: def.expectedItems, maxStatYield: def.maxStatYield, statValuePerItem: def.statValuePerItem }
   };
 
   const partySize = parseInt(document.getElementById('selPartySize').value, 10);
@@ -1761,7 +1920,86 @@ function applySandboxAndRun() {
   document.getElementById('optDef').textContent = `${best.res.finalArmy.defense.toFixed(0)} Defense`;
 
   renderUpgradeAnalysis(partySize, hostSpeed, cloneSpeed, bag, best.res.survivedWaves);
+  renderPartyContribution(best.res.players);
   renderWaveTimeline(best.res.waveLog, best.res.wipeWave, best.res.wipeReason);
+}
+
+// Party Delivery & Personal Contribution Breakdown rendering
+function renderPartyContribution(players) {
+  const tbody = document.getElementById('tblPartyContribution');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  if (!players || players.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:24px;">No player data available for this simulation run.</td></tr>';
+    return;
+  }
+
+  const totalTeamStat = players.reduce((sum, p) => sum + (p.depositCount * p.statYield), 0);
+  const totalTeamItems = players.reduce((sum, p) => sum + Math.round(p.depositCount * (p.expectedItemsFinished || (p.statYield / (p.statValuePerItem || 3)))), 0);
+  const totalTrips = players.reduce((sum, p) => sum + p.depositCount, 0);
+
+  const roleClassMap = {
+    'Health': 'health',
+    'Melee Force': 'melee',
+    'Range Force': 'range',
+    'Magic Force': 'magic',
+    'Defense': 'defense'
+  };
+
+  players.forEach((p, idx) => {
+    const isHost = idx === 0;
+    const statsDelivered = Math.round(p.depositCount * p.statYield);
+    const itemsDelivered = Math.round(p.depositCount * (p.expectedItemsFinished || (p.statYield / (p.statValuePerItem || 3))));
+    const sharePct = totalTeamStat > 0 ? ((statsDelivered / totalTeamStat) * 100).toFixed(1) : '0.0';
+    const roleClass = roleClassMap[p.role] || '';
+
+    const tr = document.createElement('tr');
+    if (isHost) {
+      tr.style.background = 'rgba(56, 189, 248, 0.06)';
+    }
+
+    tr.innerHTML = `
+      <td>
+        <strong style="${isHost ? 'color: var(--primary);' : ''}">${p.name || (isHost ? 'Host (You)' : 'Clone ' + idx)}</strong>
+        ${isHost ? '<span style="margin-left:6px;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(56,189,248,0.2);color:var(--primary);border:1px solid rgba(56,189,248,0.3);">YOU</span>' : ''}
+      </td>
+      <td>
+        <span class="role-pill ${roleClass}" style="display:inline-flex;padding:3px 8px;font-size:11px;margin:0;">${p.role}</span>
+      </td>
+      <td>${p.cycleTime.toFixed(1)}s <span style="font-size:11px;color:var(--text-muted);">(${p.speed.toFixed(1)} spd)</span></td>
+      <td><strong>${p.depositCount}</strong> trips</td>
+      <td>~${p.statYield} <span style="color:var(--text-muted);font-size:11px;">(max ${p.maxStatYield || Math.round(p.bag * (p.statValuePerItem || 3))})</span></td>
+      <td>~${itemsDelivered.toLocaleString()} items</td>
+      <td><strong style="color:var(--accent);">${statsDelivered.toLocaleString()}</strong></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="min-width:42px;font-weight:600;font-family:var(--mono);">${sharePct}%</span>
+          <div style="flex:1;min-width:60px;background:#1e293b;height:6px;border-radius:3px;overflow:hidden;">
+            <div style="width:${sharePct}%;background:${isHost ? 'var(--primary)' : 'var(--purple)'};height:100%;"></div>
+          </div>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Add Summary Total Row
+  const totalTr = document.createElement('tr');
+  totalTr.style.borderTop = '2px solid var(--card-border)';
+  totalTr.style.fontWeight = '700';
+  totalTr.style.background = 'rgba(255, 255, 255, 0.02)';
+  totalTr.innerHTML = `
+    <td>Total Army Contribution</td>
+    <td>-</td>
+    <td>-</td>
+    <td><strong>${totalTrips}</strong> trips</td>
+    <td>-</td>
+    <td><strong>~${totalTeamItems.toLocaleString()}</strong> items</td>
+    <td><strong style="color:var(--accent);">${Math.round(totalTeamStat).toLocaleString()}</strong></td>
+    <td>100.0%</td>
+  `;
+  tbody.appendChild(totalTr);
 }
 
 window.onload = init;
