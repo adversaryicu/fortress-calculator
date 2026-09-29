@@ -626,6 +626,12 @@
 
     const calcArenaWalkDistance = (roleDef) => {
         try {
+            if (typeof ClientState.getPathDistance === 'function') {
+                const d1 = ClientState.getPathDistance('gauntlet_raid', roleDef.gatherNodeId);
+                const d2 = ClientState.getPathDistance(roleDef.gatherNodeId, roleDef.processNodeId);
+                const d3 = ClientState.getPathDistance(roleDef.processNodeId, 'gauntlet_raid');
+                if (d1 > 0 && d2 > 0 && d3 > 0) return Math.round(d1 + d2 + d3);
+            }
             const nodes = ClientState.nodesData || [];
             const byId = {};
             for (let i = 0; i < nodes.length; i++) byId[nodes[i].id] = nodes[i];
