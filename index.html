@@ -310,12 +310,12 @@
     /* Compositions Compare */
     .comp-compare-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
       margin-bottom: 24px;
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 1050px) {
       .comp-compare-grid {
         grid-template-columns: 1fr;
       }
@@ -326,11 +326,44 @@
       border: 1px solid var(--card-border);
       border-radius: 10px;
       padding: 16px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
     }
 
     .comp-box.highlight {
       border-color: rgba(56, 189, 248, 0.4);
       background: rgba(14, 165, 233, 0.06);
+    }
+
+    .comp-box.gold {
+      border-color: rgba(234, 179, 8, 0.45);
+      background: rgba(234, 179, 8, 0.06);
+      box-shadow: 0 0 20px rgba(234, 179, 8, 0.1);
+    }
+
+    .btn-view-toggle {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      color: var(--text-muted);
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-view-toggle:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .btn-view-toggle.active {
+      background: rgba(56, 189, 248, 0.18);
+      border-color: var(--primary);
+      color: var(--primary);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
     }
 
     .comp-header {
@@ -1044,12 +1077,12 @@
     </div>
 
     <div class="card">
-      <div class="comp-box highlight">
+      <div class="comp-box highlight" id="boxOptComp">
         <div class="comp-header">
           <div class="comp-title">
-            <span style="color: var(--primary);">Optimal Composition</span>
+            <span style="color: var(--primary);">Optimal Static Comp</span>
           </div>
-          <span class="comp-badge">Highest Survival Rate</span>
+          <span class="comp-badge" id="badgeOptComp">Fixed Roles</span>
         </div>
 
         <div class="role-pills" id="optRolePills">
@@ -1066,13 +1099,115 @@
         <div class="stat-row"><span>Defense Stat</span><span id="optDef">--</span></div>
       </div>
     </div>
+
+    <div class="card" id="cardSwapComp">
+      <div class="comp-box gold" id="boxSwapComp">
+        <div class="comp-header">
+          <div class="comp-title">
+            <span style="color: var(--accent);">Dynamic Host Swap</span>
+          </div>
+          <span class="comp-badge" id="badgeSwapGain" style="background: rgba(234,179,8,0.2); color: var(--accent); border: 1px solid rgba(234,179,8,0.4);">Adaptive Switch</span>
+        </div>
+
+        <div style="font-size: 12px; margin-bottom: 8px; color: var(--text-main); font-weight: 600; line-height: 1.4;" id="swapInstructionText">
+          Host: Start Melee Force &rarr; Swap to Health after 2 deposits
+        </div>
+
+        <div class="role-pills" id="swapRolePills">
+          <span class="role-pill melee">Host: Melee &rarr; HP</span>
+          <span class="role-pill health">2x Health</span>
+          <span class="role-pill melee">1x Melee</span>
+          <span class="role-pill range">1x Range</span>
+        </div>
+
+        <div class="stat-row"><span>Waves Survived</span><span style="color: var(--accent); font-weight: 800;" id="swapWaves">19</span></div>
+        <div class="stat-row"><span>Wipe Wave</span><span id="swapWipeWave">Wave 20</span></div>
+        <div class="stat-row"><span>Wipe Reason</span><span id="swapWipeReason">Health Depleted (8.3 mins)</span></div>
+        <div class="stat-row"><span>Final Army HP</span><span style="color: var(--accent);" id="swapHp">554 HP</span></div>
+        <div class="stat-row"><span>Total Force (Mel+Rng+Mag)</span><span id="swapForce">570 Force</span></div>
+        <div class="stat-row"><span>Defense Stat</span><span id="swapDef">--</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Task-Swap Simulator / Sandbox -->
+  <div class="card" style="margin-bottom: 24px; border: 1px solid rgba(234, 179, 8, 0.3); background: rgba(15, 23, 42, 0.7);">
+    <div class="card-title">
+      <span>🔄 Interactive Host Task-Swap Simulator</span>
+      <span style="font-size: 12px; color: var(--text-muted);">Simulate custom mid-raid task transitions for yourself while Clones remain locked</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 14px;">
+      <div class="control-group">
+        <label>Your Starting Task</label>
+        <select id="selCustomStartRole">
+          <option value="Melee Force" selected>Melee Force (Mine+Smith)</option>
+          <option value="Range Force">Range Force (Forage+Craft)</option>
+          <option value="Magic Force">Magic Force (Invoke+Imbue)</option>
+          <option value="Health">Health (Fish+Cook)</option>
+          <option value="Defense">Defense (Farm+Brew)</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>Swap To Task</label>
+        <select id="selCustomTargetRole">
+          <option value="Health" selected>Health (Fish+Cook)</option>
+          <option value="Melee Force">Melee Force (Mine+Smith)</option>
+          <option value="Range Force">Range Force (Forage+Craft)</option>
+          <option value="Magic Force">Magic Force (Invoke+Imbue)</option>
+          <option value="Defense">Defense (Farm+Brew)</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>Swap Condition</label>
+        <select id="selCustomTriggerType" onchange="onCustomTriggerTypeChange()">
+          <option value="deposit" selected>After X Deposits</option>
+          <option value="wave">After Wave X</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label id="lblCustomTriggerVal">Deposit Count</label>
+        <input type="number" id="numCustomTriggerVal" value="2" min="1" max="30">
+      </div>
+
+      <div class="control-group">
+        <label>Clone Team Setup</label>
+        <select id="selCustomCloneSetup">
+          <option value="best" selected>Best Solver Clones</option>
+          <option value="standard">Standard 1-of-Each Clones</option>
+          <option value="all_hp">All Clones on Health</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+      <button class="btn-run" style="margin-top: 0; width: auto; padding: 10px 20px; font-size: 13px; background: linear-gradient(135deg, #d97706, #f59e0b); color: #000;" onclick="simulateCustomSwap()">⚡ Simulate Custom Swap</button>
+      <div id="customSwapResultSummary" style="font-size: 13px; font-weight: 600; color: var(--text-muted); padding: 8px 12px; border-radius: 6px; background: rgba(15,23,42,0.8); border: 1px solid var(--card-border); flex: 1;">
+        Configure parameters above and click simulate to test any custom task swap hypothesis.
+      </div>
+    </div>
   </div>
 
   <!-- Party Delivery & Personal Contribution Breakdown -->
   <div class="card" style="margin-bottom: 24px;">
-    <div class="card-title">
-      <span>Party Delivery & Personal Contribution Breakdown</span>
-      <span style="font-size: 12px; color: var(--text-muted);">Exact Run Deliveries & Army Impact for Optimal Composition</span>
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; border-bottom: 1px solid var(--card-border); padding-bottom: 10px;">
+      <div>
+        <div class="card-title" style="margin-bottom: 2px;">
+          <span>Party Delivery & Personal Contribution Breakdown</span>
+        </div>
+        <span style="font-size: 12px; color: var(--text-muted);">Exact Run Deliveries & Army Impact for Currently Selected View</span>
+      </div>
+
+      <!-- Active Run View Switcher -->
+      <div style="display: flex; gap: 6px; align-items: center;">
+        <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-right: 4px;">VIEW:</span>
+        <button class="btn-view-toggle active" id="btnViewSwap" onclick="setActiveRunView('swap')">🔄 Dynamic Swap</button>
+        <button class="btn-view-toggle" id="btnViewOpt" onclick="setActiveRunView('opt')">⚡ Static Optimal</button>
+        <button class="btn-view-toggle" id="btnViewStd" onclick="setActiveRunView('std')">🛡️ Standard</button>
+      </div>
     </div>
 
     <table>
@@ -1309,6 +1444,12 @@ function showEmptyState() {
   document.getElementById('focusDesc').textContent = 'Paste your game audit JSON into Step 2 and click "Run Simulation" to see your optimal party composition and skill upgrade recommendations.';
   document.getElementById('stdRolePills').innerHTML = '<span style="color:var(--text-muted);font-size:12px;">Awaiting data...</span>';
   document.getElementById('optRolePills').innerHTML = '<span style="color:var(--text-muted);font-size:12px;">Awaiting data...</span>';
+  const elSwapPills = document.getElementById('swapRolePills');
+  if (elSwapPills) elSwapPills.innerHTML = '<span style="color:var(--text-muted);font-size:12px;">Awaiting data...</span>';
+  const elSwapInst = document.getElementById('swapInstructionText');
+  if (elSwapInst) elSwapInst.textContent = 'Paste audit data and run simulation...';
+  const elSwapBadge = document.getElementById('badgeSwapGain');
+  if (elSwapBadge) elSwapBadge.textContent = 'Adaptive Switch';
   document.getElementById('stdWaves').textContent = '--';
   document.getElementById('stdWipeWave').textContent = '--';
   document.getElementById('stdWipeReason').textContent = '--';
@@ -1322,6 +1463,20 @@ function showEmptyState() {
   document.getElementById('optForce').textContent = '--';
   const elOptDef = document.getElementById('optDef');
   if (elOptDef) elOptDef.textContent = '--';
+  const elSwapWaves = document.getElementById('swapWaves');
+  if (elSwapWaves) elSwapWaves.textContent = '--';
+  const elSwapWipeWave = document.getElementById('swapWipeWave');
+  if (elSwapWipeWave) elSwapWipeWave.textContent = '--';
+  const elSwapWipeReason = document.getElementById('swapWipeReason');
+  if (elSwapWipeReason) elSwapWipeReason.textContent = '--';
+  const elSwapHp = document.getElementById('swapHp');
+  if (elSwapHp) elSwapHp.textContent = '--';
+  const elSwapForce = document.getElementById('swapForce');
+  if (elSwapForce) elSwapForce.textContent = '--';
+  const elSwapDef = document.getElementById('swapDef');
+  if (elSwapDef) elSwapDef.textContent = '--';
+  const elCustomSummary = document.getElementById('customSwapResultSummary');
+  if (elCustomSummary) elCustomSummary.textContent = 'Configure parameters above and click simulate to test any custom task swap hypothesis.';
   document.getElementById('tblUpgradeRoi').innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px;">Paste audit data and run simulation to view upgrade recommendations.</td></tr>';
   document.getElementById('tblWaveTimeline').innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px;">Paste audit data and run simulation to view wave timeline.</td></tr>';
   const tblParty = document.getElementById('tblPartyContribution');
@@ -1463,26 +1618,61 @@ function computeRoleYield(gatherSkill, gatherLvl, processSkill, processLvl, bagS
   };
 }
 
-// Core Combat Simulation Engine
-function simulateCombat(party, runSeed = 12345) {
+// Stored simulation runs for interactive switching
+let latestStdRun = null;
+let latestOptRun = null;
+let latestSwapRun = null;
+let latestCustomRun = null;
+let currentViewMode = 'swap';
+
+// Helper to compute a player trip cycle given individual stats and role requirements
+function computePlayerCycle(p, roleData) {
+  const walkDist = roleData.walkDistance || 610;
+  const walkTime = walkDist / p.speed;
+  const gSuccess = (roleData.gSuccess !== undefined ? roleData.gSuccess : 75) / 100;
+  const gDouble = (roleData.gDouble !== undefined ? roleData.gDouble : 0.8) / 100;
+  const attemptsGather = p.bag / (gSuccess * (1 + gDouble));
+  const gActionTime = roleData.gatherActionTime || (roleData.actionDuration ? roleData.actionDuration / HASTE : 0.2);
+  const gatherTime = attemptsGather * gActionTime;
+
+  const pSuccess = (roleData.pSuccess !== undefined ? roleData.pSuccess : 75) / 100;
+  const pSave = (roleData.pSave !== undefined ? roleData.pSave : 0.6) / 100;
+  const attemptsProcess = p.bag / Math.max(0.01, 1 - pSave * pSuccess);
+  const pActionTime = roleData.processActionTime || (roleData.actionDuration ? roleData.actionDuration / HASTE : 0.2);
+  const processTime = attemptsProcess * pActionTime;
+
+  return {
+    walkDistance: walkDist,
+    cycleTime: walkTime + gatherTime + processTime,
+    statYield: roleData.statYield,
+    statValuePerItem: roleData.statValuePerItem || 3,
+    expectedItemsFinished: roleData.expectedItemsFinished || (roleData.statYield / (roleData.statValuePerItem || 3))
+  };
+}
+
+// Core Combat Simulation Engine (Supports both static and mid-raid dynamic task swapping for Host)
+function simulateCombat(party, runSeed = 12345, hostSwap = null, roleMap = null) {
   let army = { health: 10, currentHealth: 10, melee: 10, range: 10, magic: 10, defense: 10 };
-  const players = party.map(p => {
-    const walkDist = p.walkDistance || 610;
-    const walkTime = walkDist / p.speed;
-    const gSuccess = p.gSuccess / 100;
-    const gDouble = p.gDouble / 100;
-    const attemptsGather = p.bag / (gSuccess * (1 + gDouble));
-    const gActionTime = p.gatherActionTime || (p.actionDuration ? p.actionDuration / HASTE : 0.2);
-    const gatherTime = attemptsGather * gActionTime;
-
-    const pSuccess = p.pSuccess / 100;
-    const pSave = p.pSave / 100;
-    const attemptsProcess = p.bag / Math.max(0.01, 1 - pSave * pSuccess);
-    const pActionTime = p.processActionTime || (p.actionDuration ? p.actionDuration / HASTE : 0.2);
-    const processTime = attemptsProcess * pActionTime;
-
-    const cycleTime = walkTime + gatherTime + processTime;
-    return { ...p, walkDistance: walkDist, cycleTime, nextDepositTime: cycleTime, depositCount: 0 };
+  const players = party.map((p, idx) => {
+    const isHost = (idx === 0 || p.name === 'Host (You)');
+    const cycle = computePlayerCycle(p, p);
+    return {
+      ...p,
+      isHost,
+      walkDistance: cycle.walkDistance,
+      cycleTime: cycle.cycleTime,
+      nextDepositTime: cycle.cycleTime,
+      depositCount: 0,
+      initialRole: p.role,
+      statYield: cycle.statYield,
+      initialStatYield: cycle.statYield,
+      statValuePerItem: cycle.statValuePerItem,
+      initialStatValuePerItem: cycle.statValuePerItem,
+      expectedItemsFinished: cycle.expectedItemsFinished,
+      initialItemsFinished: cycle.expectedItemsFinished,
+      depositsByRole: { [p.role]: 0 },
+      swapped: false
+    };
   });
 
   let waves = [];
@@ -1498,7 +1688,7 @@ function simulateCombat(party, runSeed = 12345) {
   let waveLog = [];
 
   while (time < 3600 && !wipeReason) {
-    time = Number((time + dt).toFixed(2));
+    time = Math.round((time + dt) * 10) / 10;
 
     // Player deposits
     players.forEach(p => {
@@ -1516,6 +1706,43 @@ function simulateCombat(party, runSeed = 12345) {
           army.defense += p.statYield;
         }
         p.depositCount++;
+        p.depositsByRole[p.role] = (p.depositsByRole[p.role] || 0) + 1;
+
+        // Host mid-raid task swap check
+        // Clones cannot swap tasks, but Host can change task after X deposits or X waves
+        if (p.isHost && hostSwap && !p.swapped && roleMap && hostSwap.targetRole && hostSwap.targetRole !== p.role) {
+          let shouldSwap = false;
+          if (hostSwap.triggerType === 'deposit' && p.depositCount >= hostSwap.triggerValue) {
+            shouldSwap = true;
+          } else if (hostSwap.triggerType === 'wave' && (nextWaveNum - 1) >= hostSwap.triggerValue) {
+            shouldSwap = true;
+          }
+
+          if (shouldSwap) {
+            p.swapped = true;
+            const prevRole = p.role;
+            p.role = hostSwap.targetRole;
+            const targetRoleData = roleMap[hostSwap.targetRole];
+            if (targetRoleData) {
+              const newCycle = computePlayerCycle(p, targetRoleData);
+              p.cycleTime = newCycle.cycleTime;
+              p.statYield = newCycle.statYield;
+              p.statValuePerItem = newCycle.statValuePerItem;
+              p.expectedItemsFinished = newCycle.expectedItemsFinished;
+              p.walkDistance = newCycle.walkDistance;
+            }
+            p.swappedAtTime = time;
+            p.swappedAtWave = nextWaveNum - 1;
+            p.swappedAtDeposit = p.depositCount;
+            p.swappedFromRole = prevRole;
+            p.depositsByRole[p.role] = 0;
+
+            if (waves.length > 0) {
+              waves[0].swapNote = `Host swapped to ${p.role}`;
+            }
+          }
+        }
+
         p.nextDepositTime += p.cycleTime;
       }
     });
@@ -1544,7 +1771,8 @@ function simulateCombat(party, runSeed = 12345) {
         melAtk: atk * lanes[0],
         rngAtk: atk * lanes[1],
         magAtk: atk * lanes[2],
-        totalAtk: atk
+        totalAtk: atk,
+        swapNote: null
       });
 
       nextWaveNum++;
@@ -1582,7 +1810,8 @@ function simulateCombat(party, runSeed = 12345) {
           magAtk: front.magAtk,
           enemyDef: front.defense,
           armyHpLeft: Math.max(0, army.currentHealth),
-          armyHpMax: army.health
+          armyHpMax: army.health,
+          swapNote: front.swapNote
         });
         waves.shift();
       }
@@ -1631,6 +1860,7 @@ function findOptimalComposition(roleMap, partySize = 5, hostSpeed = 13.2, cloneS
 
   let best = null;
   let standardRes = null;
+  const cloneBestMap = new Map();
 
   roleNames.forEach(hostRole => {
     cloneCombos.forEach(clones => {
@@ -1644,6 +1874,12 @@ function findOptimalComposition(roleMap, partySize = 5, hostSpeed = 13.2, cloneS
       const fullComp = [hostRole, ...clones];
       const res = simulateCombat(party);
 
+      const cloneKey = clones.join(',');
+      const curMax = cloneBestMap.get(cloneKey) || 0;
+      if (res.survivedWaves > curMax) {
+        cloneBestMap.set(cloneKey, res.survivedWaves);
+      }
+
       const isStd = partySize === 5 && fullComp.join(',') === 'Health,Melee Force,Range Force,Magic Force,Defense';
       if (isStd) {
         standardRes = { comp: fullComp, res, party };
@@ -1656,7 +1892,114 @@ function findOptimalComposition(roleMap, partySize = 5, hostSpeed = 13.2, cloneS
     });
   });
 
-  return { best, standard: standardRes || best };
+  // Rank clone combos to prioritize top candidates for swap solver
+  const scoredClones = cloneCombos.map(clones => ({
+    clones,
+    maxWaves: cloneBestMap.get(clones.join(',')) || 0
+  }));
+  scoredClones.sort((a, b) => b.maxWaves - a.maxWaves);
+
+  return { best, standard: standardRes || best, scoredClones };
+}
+
+// Dynamic Host-Swap Strategy Optimizer
+// Explores mid-raid role switching for Host across X deposits or X waves to discover extra waves
+function findOptimalSwapStrategy(roleMap, partySize = 5, hostSpeed = 13.2, cloneSpeed = 11.9, bag = 28, bestStatic = null, scoredClones = []) {
+  const roleNames = ['Health', 'Melee Force', 'Range Force', 'Magic Force', 'Defense'];
+
+  // Candidate clone setups:
+  // 1. Clones from best static
+  // 2. Clones from standard comp
+  // 3. Top scored clones from static combinatorial search
+  const candidateCloneCombos = [];
+  const seen = new Set();
+
+  if (bestStatic && bestStatic.comp.length > 1) {
+    const staticClones = bestStatic.comp.slice(1);
+    candidateCloneCombos.push(staticClones);
+    seen.add(staticClones.join(','));
+  }
+
+  if (partySize === 5) {
+    const stdClones = ['Melee Force', 'Range Force', 'Magic Force', 'Defense'];
+    if (!seen.has(stdClones.join(','))) {
+      candidateCloneCombos.push(stdClones);
+      seen.add(stdClones.join(','));
+    }
+  }
+
+  for (const item of scoredClones) {
+    const key = item.clones.join(',');
+    if (!seen.has(key)) {
+      candidateCloneCombos.push(item.clones);
+      seen.add(key);
+      if (candidateCloneCombos.length >= 8) break;
+    }
+  }
+
+  // Fallback for partySize 1 (solo)
+  if (partySize === 1 && candidateCloneCombos.length === 0) {
+    candidateCloneCombos.push([]);
+  }
+
+  let bestSwap = null;
+
+  candidateCloneCombos.forEach(clones => {
+    roleNames.forEach(startRole => {
+      roleNames.forEach(targetRole => {
+        if (startRole === targetRole) return;
+
+        // Test deposit triggers 1..10
+        for (let d = 1; d <= 10; d++) {
+          const party = [
+            { name: 'Host (You)', speed: hostSpeed, bag, role: startRole, ...roleMap[startRole] }
+          ];
+          clones.forEach((cRole, idx) => {
+            party.push({ name: 'Clone ' + (idx + 1), speed: cloneSpeed, bag, role: cRole, ...roleMap[cRole] });
+          });
+
+          const swap = { triggerType: 'deposit', triggerValue: d, targetRole };
+          const res = simulateCombat(party, 12345, swap, roleMap);
+
+          if (!bestSwap || res.survivedWaves > bestSwap.res.survivedWaves ||
+              (res.survivedWaves === bestSwap.res.survivedWaves && res.wipeTime > bestSwap.res.wipeTime)) {
+            bestSwap = {
+              comp: [startRole, ...clones],
+              hostSwap: swap,
+              res,
+              party
+            };
+          }
+        }
+
+        // Test wave triggers: 2, 4, 6, 8, 10, 12, 14, 16
+        const waveCheckpoints = [2, 4, 6, 8, 10, 12, 14, 16];
+        waveCheckpoints.forEach(w => {
+          const party = [
+            { name: 'Host (You)', speed: hostSpeed, bag, role: startRole, ...roleMap[startRole] }
+          ];
+          clones.forEach((cRole, idx) => {
+            party.push({ name: 'Clone ' + (idx + 1), speed: cloneSpeed, bag, role: cRole, ...roleMap[cRole] });
+          });
+
+          const swap = { triggerType: 'wave', triggerValue: w, targetRole };
+          const res = simulateCombat(party, 12345, swap, roleMap);
+
+          if (!bestSwap || res.survivedWaves > bestSwap.res.survivedWaves ||
+              (res.survivedWaves === bestSwap.res.survivedWaves && res.wipeTime > bestSwap.res.wipeTime)) {
+            bestSwap = {
+              comp: [startRole, ...clones],
+              hostSwap: swap,
+              res,
+              party
+            };
+          }
+        });
+      });
+    });
+  });
+
+  return bestSwap;
 }
 
 // Master Run Controller
@@ -1750,29 +2093,45 @@ function runFullOptimizer() {
     }
   });
 
-  const { best, standard } = findOptimalComposition(activeRoleStats, partySize, hostSpeed, cloneSpeed, bag);
+  const { best, standard, scoredClones } = findOptimalComposition(activeRoleStats, partySize, hostSpeed, cloneSpeed, bag);
+  const bestSwap = findOptimalSwapStrategy(activeRoleStats, partySize, hostSpeed, cloneSpeed, bag, best, scoredClones);
 
-  // Render Hero Stats
-  document.getElementById('resMaxWave').textContent = `Wave ${best.res.survivedWaves} Cleared`;
-  document.getElementById('resWipeReason').textContent = `Wiped on Wave ${best.res.wipeWave} (${best.res.wipeReason})`;
+  latestStdRun = standard;
+  latestOptRun = best;
+  latestSwapRun = bestSwap;
 
-  // Render Rare Drop Rates
-  renderDropRates(best.res.survivedWaves);
+  const swapGainedWave = bestSwap && bestSwap.res.survivedWaves > best.res.survivedWaves;
+  const topResult = swapGainedWave ? bestSwap : best;
+
+  // Render Hero Stats reflecting the highest achievable wave
+  document.getElementById('resMaxWave').textContent = `Wave ${topResult.res.survivedWaves} Cleared${swapGainedWave ? ' ⚡ (+1 Extra Wave!)' : ''}`;
+  document.getElementById('resWipeReason').textContent = `Wiped on Wave ${topResult.res.wipeWave} (${topResult.res.wipeReason})`;
+
+  // Render Rare Drop Rates for the top run
+  renderDropRates(topResult.res.survivedWaves);
 
   // Format best composition summary
-  const roleCounts = {};
-  best.comp.forEach(r => { roleCounts[r] = (roleCounts[r] || 0) + 1; });
-  const compTokens = [];
-  if (roleCounts['Health']) compTokens.push(`${roleCounts['Health']}x HP`);
-  if (roleCounts['Melee Force']) compTokens.push(`${roleCounts['Melee Force']}x Mel`);
-  if (roleCounts['Range Force']) compTokens.push(`${roleCounts['Range Force']}x Rng`);
-  if (roleCounts['Magic Force']) compTokens.push(`${roleCounts['Magic Force']}x Mag`);
-  if (roleCounts['Defense']) compTokens.push(`${roleCounts['Defense']}x Def`);
-  document.getElementById('resBestCompSummary').textContent = compTokens.join(', ');
+  if (swapGainedWave) {
+    const trigDesc = bestSwap.hostSwap.triggerType === 'deposit' ? `${bestSwap.hostSwap.triggerValue} deposits` : `Wave ${bestSwap.hostSwap.triggerValue}`;
+    document.getElementById('resBestCompSummary').textContent = `${bestSwap.comp[0]} ➔ ${bestSwap.hostSwap.targetRole} (${trigDesc})`;
+  } else {
+    const roleCounts = {};
+    best.comp.forEach(r => { roleCounts[r] = (roleCounts[r] || 0) + 1; });
+    const compTokens = [];
+    if (roleCounts['Health']) compTokens.push(`${roleCounts['Health']}x HP`);
+    if (roleCounts['Melee Force']) compTokens.push(`${roleCounts['Melee Force']}x Mel`);
+    if (roleCounts['Range Force']) compTokens.push(`${roleCounts['Range Force']}x Rng`);
+    if (roleCounts['Magic Force']) compTokens.push(`${roleCounts['Magic Force']}x Mag`);
+    if (roleCounts['Defense']) compTokens.push(`${roleCounts['Defense']}x Def`);
+    document.getElementById('resBestCompSummary').textContent = compTokens.join(', ');
+  }
 
   // Render Pill Badges
   renderRolePills('stdRolePills', standard.comp);
   renderRolePills('optRolePills', best.comp);
+  if (bestSwap) {
+    renderSwapRolePills('swapRolePills', bestSwap.comp[0], bestSwap.hostSwap.targetRole, bestSwap.comp.slice(1));
+  }
 
   // Standard details
   document.getElementById('stdWaves').textContent = standard.res.survivedWaves;
@@ -1782,7 +2141,7 @@ function runFullOptimizer() {
   document.getElementById('stdForce').textContent = `${(standard.res.finalArmy.melee + standard.res.finalArmy.range + standard.res.finalArmy.magic).toFixed(0)} Force`;
   document.getElementById('stdDef').textContent = `${standard.res.finalArmy.defense.toFixed(0)} Defense`;
 
-  // Optimal details
+  // Optimal static details
   document.getElementById('optWaves').textContent = best.res.survivedWaves;
   document.getElementById('optWipeWave').textContent = 'Wave ' + best.res.wipeWave;
   document.getElementById('optWipeReason').textContent = `${best.res.wipeReason} (${(best.res.wipeTime / 60).toFixed(1)} mins)`;
@@ -1791,6 +2150,43 @@ function runFullOptimizer() {
   const elOptDef = document.getElementById('optDef');
   if (elOptDef) elOptDef.textContent = `${best.res.finalArmy.defense.toFixed(0)} Defense`;
 
+  // Dynamic host-swap details
+  if (bestSwap) {
+    const trigLabel = bestSwap.hostSwap.triggerType === 'deposit' ? `${bestSwap.hostSwap.triggerValue} deposits (~${bestSwap.res.players[0].swappedAtTime ? bestSwap.res.players[0].swappedAtTime.toFixed(0) : '?'}s)` : `Wave ${bestSwap.hostSwap.triggerValue}`;
+    const elSwapInst = document.getElementById('swapInstructionText');
+    if (elSwapInst) {
+      elSwapInst.innerHTML = `Host starts on <strong>${bestSwap.comp[0]}</strong> &rarr; swaps to <strong>${bestSwap.hostSwap.targetRole}</strong> after <strong>${trigLabel}</strong>`;
+    }
+
+    const elSwapBadge = document.getElementById('badgeSwapGain');
+    if (elSwapBadge) {
+      if (swapGainedWave) {
+        elSwapBadge.textContent = '⚡ +1 EXTRA WAVE!';
+        elSwapBadge.style.background = 'rgba(16,185,129,0.2)';
+        elSwapBadge.style.color = '#34d399';
+        elSwapBadge.style.borderColor = 'rgba(16,185,129,0.4)';
+      } else {
+        elSwapBadge.textContent = `Matches Static (${bestSwap.res.survivedWaves}w)`;
+        elSwapBadge.style.background = 'rgba(234,179,8,0.2)';
+        elSwapBadge.style.color = 'var(--accent)';
+        elSwapBadge.style.borderColor = 'rgba(234,179,8,0.4)';
+      }
+    }
+
+    const elSwapWaves = document.getElementById('swapWaves');
+    if (elSwapWaves) elSwapWaves.textContent = bestSwap.res.survivedWaves;
+    const elSwapWipeWave = document.getElementById('swapWipeWave');
+    if (elSwapWipeWave) elSwapWipeWave.textContent = 'Wave ' + bestSwap.res.wipeWave;
+    const elSwapWipeReason = document.getElementById('swapWipeReason');
+    if (elSwapWipeReason) elSwapWipeReason.textContent = `${bestSwap.res.wipeReason} (${(bestSwap.res.wipeTime / 60).toFixed(1)} mins)`;
+    const elSwapHp = document.getElementById('swapHp');
+    if (elSwapHp) elSwapHp.textContent = `${bestSwap.res.finalArmy.health.toFixed(0)} HP`;
+    const elSwapForce = document.getElementById('swapForce');
+    if (elSwapForce) elSwapForce.textContent = `${(bestSwap.res.finalArmy.melee + bestSwap.res.finalArmy.range + bestSwap.res.finalArmy.magic).toFixed(0)} Force`;
+    const elSwapDef = document.getElementById('swapDef');
+    if (elSwapDef) elSwapDef.textContent = `${bestSwap.res.finalArmy.defense.toFixed(0)} Defense`;
+  }
+
   // Render Upgrade Sensitivity & Roadmap
   try {
     renderUpgradeAnalysis(partySize, hostSpeed, cloneSpeed, bag, best.res.survivedWaves);
@@ -1798,18 +2194,145 @@ function runFullOptimizer() {
     console.error("renderUpgradeAnalysis failed:", err);
   }
 
-  // Render Party Delivery & Personal Contribution Breakdown
-  try {
-    renderPartyContribution(best.res.players);
-  } catch (err) {
-    console.error("renderPartyContribution failed:", err);
+  // Set active view to the winning composition
+  setActiveRunView(swapGainedWave ? 'swap' : 'opt');
+}
+
+// Interactive View Switcher for Delivery & Timeline tables
+function setActiveRunView(mode) {
+  currentViewMode = mode;
+  ['btnViewSwap', 'btnViewOpt', 'btnViewStd'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.classList.remove('active');
+  });
+
+  const activeBtn = document.getElementById(mode === 'swap' ? 'btnViewSwap' : (mode === 'opt' ? 'btnViewOpt' : (mode === 'std' ? 'btnViewStd' : '')));
+  if (activeBtn) activeBtn.classList.add('active');
+
+  let activeData = null;
+  let activeName = '';
+  if (mode === 'swap' && latestSwapRun) {
+    activeData = latestSwapRun;
+    activeName = `Dynamic Host-Swap Strategy (${latestSwapRun.res.survivedWaves} Waves Cleared)`;
+  } else if (mode === 'opt' && latestOptRun) {
+    activeData = latestOptRun;
+    activeName = `Optimal Static Composition (${latestOptRun.res.survivedWaves} Waves Cleared)`;
+  } else if (mode === 'std' && latestStdRun) {
+    activeData = latestStdRun;
+    activeName = `Standard Composition (${latestStdRun.res.survivedWaves} Waves Cleared)`;
+  } else if (mode === 'custom' && latestCustomRun) {
+    activeData = latestCustomRun;
+    activeName = `Custom Task-Swap Run (${latestCustomRun.res.survivedWaves} Waves Cleared)`;
   }
 
-  // Render Wave Timeline
-  try {
-    renderWaveTimeline(best.res.waveLog, best.res.wipeWave, best.res.wipeReason);
-  } catch (err) {
-    console.error("renderWaveTimeline failed:", err);
+  const lblName = document.getElementById('lblActiveRunViewName');
+  if (lblName && activeName) lblName.textContent = activeName;
+
+  if (activeData) {
+    renderPartyContribution(activeData.res.players);
+    renderWaveTimeline(activeData.res.waveLog, activeData.res.wipeWave, activeData.res.wipeReason);
+  }
+}
+
+// User-Facing Interactive Task-Swap Simulator (Mid-Raid Sandbox)
+function simulateCustomSwap() {
+  if (!activeRoleStats || Object.keys(activeRoleStats).length === 0) {
+    alert("Please paste your audit JSON and run the optimizer first.");
+    return;
+  }
+  const startRole = document.getElementById('selCustomStartRole').value;
+  const targetRole = document.getElementById('selCustomTargetRole').value;
+  const triggerType = document.getElementById('selCustomTriggerType').value;
+  const triggerValue = parseInt(document.getElementById('numCustomTriggerVal').value, 10) || 1;
+  const cloneSetupType = document.getElementById('selCustomCloneSetup').value;
+
+  const partySize = parseInt(document.getElementById('selPartySize').value, 10) || 5;
+  const hostSpeed = parseFloat(document.getElementById('numHostSpeed').value) || 13.2;
+  const cloneSpeed = parseFloat(document.getElementById('numCloneSpeed').value) || 11.9;
+  const bag = parseInt(document.getElementById('numBagSize').value, 10) || 28;
+
+  let clones = [];
+  if (cloneSetupType === 'best' && latestOptRun && latestOptRun.comp.length > 1) {
+    clones = latestOptRun.comp.slice(1);
+  } else if (cloneSetupType === 'all_hp') {
+    clones = Array(partySize - 1).fill('Health');
+  } else {
+    const defaultRoles = ['Health', 'Melee Force', 'Range Force', 'Magic Force', 'Defense'];
+    clones = defaultRoles.slice(0, partySize - 1);
+  }
+
+  const party = [
+    { name: 'Host (You)', speed: hostSpeed, bag, role: startRole, ...activeRoleStats[startRole] }
+  ];
+  clones.forEach((cRole, idx) => {
+    party.push({ name: 'Clone ' + (idx + 1), speed: cloneSpeed, bag, role: cRole, ...activeRoleStats[cRole] });
+  });
+
+  const swap = { triggerType, triggerValue, targetRole };
+  const res = simulateCombat(party, 12345, swap, activeRoleStats);
+
+  latestCustomRun = {
+    comp: [startRole, ...clones],
+    hostSwap: swap,
+    res,
+    party
+  };
+
+  const baselineWaves = latestOptRun ? latestOptRun.res.survivedWaves : 18;
+  const diff = res.survivedWaves - baselineWaves;
+  const diffBadge = diff > 0 ? `<span style="color:var(--success);font-weight:bold;">(+${diff} waves vs Static Best!)</span>` :
+                   (diff === 0 ? `<span style="color:var(--accent);font-weight:bold;">(Matches Static Best: ${res.survivedWaves}w)</span>` :
+                                 `<span style="color:#f87171;">(${diff} waves vs Static Best)</span>`);
+
+  const summaryEl = document.getElementById('customSwapResultSummary');
+  if (summaryEl) {
+    summaryEl.innerHTML = `Result: <strong style="color:var(--accent);">Wave ${res.survivedWaves} Cleared</strong> | Wiped Wave ${res.wipeWave} (${res.wipeReason}) | ${diffBadge} <button class="btn-view-toggle active" style="margin-left:8px;padding:3px 8px;font-size:11px;" onclick="setActiveRunView('custom')">View In Timeline &darr;</button>`;
+  }
+
+  setActiveRunView('custom');
+}
+
+function onCustomTriggerTypeChange() {
+  const type = document.getElementById('selCustomTriggerType').value;
+  const lbl = document.getElementById('lblCustomTriggerVal');
+  const input = document.getElementById('numCustomTriggerVal');
+  if (type === 'deposit') {
+    if (lbl) lbl.textContent = 'Deposit Count';
+    if (input) { input.value = '2'; input.min = '1'; input.max = '20'; }
+  } else {
+    if (lbl) lbl.textContent = 'Wave Threshold';
+    if (input) { input.value = '6'; input.min = '1'; input.max = '30'; }
+  }
+}
+
+function renderSwapRolePills(elementId, hostStart, hostEnd, cloneList) {
+  const container = document.getElementById(elementId);
+  if (!container) return;
+  container.innerHTML = '';
+
+  const classMap = {
+    'Health': 'health',
+    'Melee Force': 'melee',
+    'Range Force': 'range',
+    'Magic Force': 'magic',
+    'Defense': 'defense'
+  };
+
+  // Host transition pill
+  const hostPill = document.createElement('span');
+  hostPill.className = `role-pill ${classMap[hostStart] || ''}`;
+  hostPill.style.borderStyle = 'dashed';
+  hostPill.innerHTML = `Host: ${hostStart} <strong style="color:var(--accent);">&rarr;</strong> ${hostEnd}`;
+  container.appendChild(hostPill);
+
+  // Clone pills
+  const counts = {};
+  cloneList.forEach(r => { counts[r] = (counts[r] || 0) + 1; });
+  for (const [r, count] of Object.entries(counts)) {
+    const span = document.createElement('span');
+    span.className = `role-pill ${classMap[r] || ''}`;
+    span.textContent = `${count}x ${r}`;
+    container.appendChild(span);
   }
 }
 
@@ -2004,6 +2527,7 @@ function renderWaveTimeline(waveLog, wipeWave, wipeReason) {
 
   waveLog.forEach(w => {
     const tr = document.createElement('tr');
+    const swapBadge = w.swapNote ? ` <span style="margin-left:6px;font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(234,179,8,0.15);color:var(--accent);border:1px solid rgba(234,179,8,0.3);font-weight:700;">🔄 ${w.swapNote}</span>` : '';
     tr.innerHTML = `
       <td><strong>Wave ${w.waveNum}</strong></td>
       <td>${w.spawnTime.toFixed(0)}s</td>
@@ -2011,7 +2535,7 @@ function renderWaveTimeline(waveLog, wipeWave, wipeReason) {
       <td>${w.melAtk.toFixed(0)} / ${w.rngAtk.toFixed(0)} / ${w.magAtk.toFixed(0)}</td>
       <td>${w.enemyDef}</td>
       <td>${w.armyHpLeft.toFixed(0)} / ${w.armyHpMax.toFixed(0)}</td>
-      <td><span class="cleared-badge">\u2713 Cleared (${w.clearTime.toFixed(1)}s)</span></td>
+      <td><span class="cleared-badge">\u2713 Cleared (${w.clearTime.toFixed(1)}s)</span>${swapBadge}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -2149,10 +2673,6 @@ function renderPartyContribution(players) {
     return;
   }
 
-  const totalTeamStat = players.reduce((sum, p) => sum + (p.depositCount * p.statYield), 0);
-  const totalTeamItems = players.reduce((sum, p) => sum + Math.round(p.depositCount * (p.expectedItemsFinished || (p.statYield / (p.statValuePerItem || 3)))), 0);
-  const totalTrips = players.reduce((sum, p) => sum + p.depositCount, 0);
-
   const roleClassMap = {
     'Health': 'health',
     'Melee Force': 'melee',
@@ -2161,12 +2681,54 @@ function renderPartyContribution(players) {
     'Defense': 'defense'
   };
 
+  const getPlayerStatsDelivered = (p) => {
+    if (p.swapped) {
+      const dep1 = p.swappedAtDeposit || 0;
+      const dep2 = Math.max(0, p.depositCount - dep1);
+      return Math.round((dep1 * (p.initialStatYield || p.statYield)) + (dep2 * p.statYield));
+    }
+    return Math.round(p.depositCount * p.statYield);
+  };
+
+  const getPlayerItemsDelivered = (p) => {
+    if (p.swapped) {
+      const dep1 = p.swappedAtDeposit || 0;
+      const dep2 = Math.max(0, p.depositCount - dep1);
+      return Math.round((dep1 * (p.initialItemsFinished || 20)) + (dep2 * (p.expectedItemsFinished || 20)));
+    }
+    return Math.round(p.depositCount * (p.expectedItemsFinished || (p.statYield / (p.statValuePerItem || 3))));
+  };
+
+  const totalTeamStat = players.reduce((sum, p) => sum + getPlayerStatsDelivered(p), 0);
+  const totalTeamItems = players.reduce((sum, p) => sum + getPlayerItemsDelivered(p), 0);
+  const totalTrips = players.reduce((sum, p) => sum + p.depositCount, 0);
+
   players.forEach((p, idx) => {
-    const isHost = idx === 0;
-    const statsDelivered = Math.round(p.depositCount * p.statYield);
-    const itemsDelivered = Math.round(p.depositCount * (p.expectedItemsFinished || (p.statYield / (p.statValuePerItem || 3))));
+    const isHost = idx === 0 || p.isHost;
+    const statsDelivered = getPlayerStatsDelivered(p);
+    const itemsDelivered = getPlayerItemsDelivered(p);
     const sharePct = totalTeamStat > 0 ? ((statsDelivered / totalTeamStat) * 100).toFixed(1) : '0.0';
-    const roleClass = roleClassMap[p.role] || '';
+
+    let roleHtml = '';
+    let tripHtml = `<strong>${p.depositCount}</strong> trips`;
+    let singleYieldHtml = `~${p.statYield} <span style="color:var(--text-muted);font-size:11px;">(max ${p.maxStatYield || Math.round(p.bag * (p.statValuePerItem || 3))})</span>`;
+
+    if (p.swapped) {
+      const dep1 = p.swappedAtDeposit || 0;
+      const dep2 = Math.max(0, p.depositCount - dep1);
+      roleHtml = `
+        <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+          <span class="role-pill ${roleClassMap[p.swappedFromRole] || ''}" style="display:inline-flex;padding:2px 6px;font-size:10px;margin:0;">${p.swappedFromRole}</span>
+          <strong style="color:var(--accent);font-size:11px;">&rarr;</strong>
+          <span class="role-pill ${roleClassMap[p.role] || ''}" style="display:inline-flex;padding:2px 6px;font-size:10px;margin:0;">${p.role}</span>
+        </div>
+        <div style="font-size:10px;color:var(--accent);margin-top:3px;">Swapped after trip #${dep1}</div>
+      `;
+      tripHtml = `<strong>${p.depositCount}</strong> trips <span style="font-size:10px;color:var(--text-muted);display:block;">(${dep1} ${p.swappedFromRole.slice(0,3)} + ${dep2} ${p.role.slice(0,3)})</span>`;
+      singleYieldHtml = `~${p.initialStatYield || p.statYield} &rarr; ~${p.statYield}`;
+    } else {
+      roleHtml = `<span class="role-pill ${roleClassMap[p.role] || ''}" style="display:inline-flex;padding:3px 8px;font-size:11px;margin:0;">${p.role}</span>`;
+    }
 
     const tr = document.createElement('tr');
     if (isHost) {
@@ -2178,12 +2740,10 @@ function renderPartyContribution(players) {
         <strong style="${isHost ? 'color: var(--primary);' : ''}">${p.name || (isHost ? 'Host (You)' : 'Clone ' + idx)}</strong>
         ${isHost ? '<span style="margin-left:6px;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(56,189,248,0.2);color:var(--primary);border:1px solid rgba(56,189,248,0.3);">YOU</span>' : ''}
       </td>
-      <td>
-        <span class="role-pill ${roleClass}" style="display:inline-flex;padding:3px 8px;font-size:11px;margin:0;">${p.role}</span>
-      </td>
+      <td>${roleHtml}</td>
       <td>${p.cycleTime.toFixed(1)}s <span style="font-size:11px;color:var(--text-muted);">(${p.speed.toFixed(1)} spd)</span></td>
-      <td><strong>${p.depositCount}</strong> trips</td>
-      <td>~${p.statYield} <span style="color:var(--text-muted);font-size:11px;">(max ${p.maxStatYield || Math.round(p.bag * (p.statValuePerItem || 3))})</span></td>
+      <td>${tripHtml}</td>
+      <td>${singleYieldHtml}</td>
       <td>~${itemsDelivered.toLocaleString()} items</td>
       <td><strong style="color:var(--accent);">${statsDelivered.toLocaleString()}</strong></td>
       <td>

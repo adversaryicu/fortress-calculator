@@ -42,6 +42,13 @@ The **Fortress Wave Simulator** bridges the gap between player skilling stats an
 - Identifies the provably optimal composition to maximize wave depth.
 - Displays a head-to-head comparison between the optimal setup and the standard balanced composition (1 of each role).
 
+### Dynamic In-Raid Task-Swap Simulator & Optimizer
+- **Mid-Raid Role Transition Engine**: Models the game's actual mechanic where the **Host** can switch to any other role during the fortress run, while **Clones** remain locked to their assigned roles.
+- **Deposit & Wave Trigger Detection**: Automatically simulates and checks whether swapping after **X deposits** or **after Wave X** unlocks an extra cleared wave.
+- **Frontload vs. Sustain Analysis**: Identifies high-value transition tactics (e.g., frontloading early damage with Melee/Range to melt initial waves, then swapping to Health to absorb late-wave boss scaling).
+- **Interactive Sandbox Playground**: Includes a dedicated simulator panel to test custom swap triggers (start role, target role, deposit/wave conditions, and clone presets) with live timeline updates.
+- **3-Way Strategy Comparison**: Compares **Standard**, **Optimal Static**, and **Dynamic Host-Swap** configurations side-by-side with full delivery share and timeline logging.
+
 ### Rare Loot Drop Probability Engine
 - Derives odds from the official Gauntlet loot formulas (`GAUNTLET_RARE_DROP_BASE = 0.0002381`, `GAUNTLET_RARE_CAP_L = 64` plateau).
 - **Cumulative Run Probability**: Calculates your total cumulative odds of receiving at least one rare drop across your run (e.g. `4.0% Overall`, `~1 in 25 runs`).
