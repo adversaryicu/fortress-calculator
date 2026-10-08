@@ -801,7 +801,22 @@
 
         const collectorBonus = ((typeof ClientState.getCollectorProgress === 'function' ? ClientState.getCollectorProgress() : 0)
             * ((typeof Constants !== 'undefined' && Constants.COLLECTOR_MAX_MOVE_SPEED) || 0.05));
-        const ancientBonus = typeof ClientState.getShardSetMoveSpeedBonus === 'function' ? ClientState.getShardSetMoveSpeedBonus() : 0;
+        let potionMult = 0;
+        if (ClientState.activePotions && ClientState.activePotions.movement && ClientState.activePotions.movement.length > 0) {
+            const potId = ClientState.activePotions.movement[0].potionId;
+            if (typeof Constants !== 'undefined' && Constants.MOVEMENT_POTION_LOOKUP && Constants.MOVEMENT_POTION_LOOKUP[potId]) {
+                potionMult = Constants.MOVEMENT_POTION_LOOKUP[potId].speedMultiplier || 0;
+            }
+        }
+
+        // If player is currently in the Fortress raid lobby, read exact server steps/sec directly
+        if (ClientState.raidLobby && ClientState.raidLobby.members) {
+            const me = ClientState.raidLobby.members.find(m => m.playerId === ClientState.playerId);
+            if (me && me.move) {
+                if (me.move.stepsWithPotion != null) return Number(me.move.stepsWithPotion.toFixed(1));
+                if (me.move.steps != null) return Number(me.move.steps.toFixed(1));
+            }
+        }
 
         const mvOpts = {
             vigorLevel: vigorEffLevel,
@@ -811,7 +826,8 @@
             beacon: beaconBonus,
             collector: collectorBonus,
             ancient: ancientBonus,
-            talent: talentBonus
+            talent: talentBonus,
+            potionMult: potionMult
         };
 
         if (typeof Constants !== 'undefined' && typeof Constants.totalMovementSpeed === 'function') {
@@ -846,10 +862,10 @@
         const reqLvl = getReqLevel(tier);
         const gSuccess = getSuccess(r.gather, reqLvl);
         const pSuccess = getSuccess(r.process, reqLvl);
-        const gDouble = getDoubleOrSave(r.gather, reqLvl);
-        const pSave = getDoubleOrSave(r.process, reqLvl);
-        const gRawDuration = getDuration(r.gather, reqLvl);
-        const pRawDuration = getDuration(r.process, reqLvl);
+        const gDouble = getDoubleOrSave(r.gather, 1);
+        const pSave = getDoubleOrSave(r.process, 1);
+        const gRawDuration = getDuration(r.gather, 1);
+        const pRawDuration = getDuration(r.process, 1);
         const gActionTime = Number((gRawDuration / haste).toFixed(3));
         const pActionTime = Number((pRawDuration / haste).toFixed(3));
         const tierVal = getDepositVal(tier);
