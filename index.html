@@ -818,6 +818,10 @@
             }
         }
 
+        const ancientBonus = (typeof ClientState.getShardSetMoveSpeedBonus === 'function')
+            ? ClientState.getShardSetMoveSpeedBonus()
+            : 0;
+
         const mvOpts = {
             vigorLevel: vigorEffLevel,
             telescope: telBonus,
