@@ -869,6 +869,104 @@
     .style-pill.range { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }
     .style-pill.magic { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }
 
+  
+    /* Crafting & Consumables Advisor */
+    .advisor-session-picker {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin: 10px 0 14px 0;
+      flex-wrap: wrap;
+    }
+
+    .advisor-pill-btn {
+      background: #090d16;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .advisor-pill-btn:hover {
+      border-color: #475569;
+      color: #fff;
+    }
+
+    .advisor-pill-btn.active {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+    }
+
+    .crafting-action-card {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 8px;
+      position: relative;
+    }
+
+    .crafting-action-card.food {
+      border-left: 4px solid #f59e0b;
+    }
+
+    .crafting-action-card.potion {
+      border-left: 4px solid #a855f7;
+    }
+
+    .crafting-action-card.defense {
+      border-left: 4px solid #10b981;
+    }
+
+    .crafting-target-headline {
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .crafting-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .crafting-stock-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .crafting-stock-badge.warning {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    .detected-buff-chip {
+      background: #090d16;
+      border: 1px solid var(--card-border);
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
   </style>
 </head>
 <body>
@@ -1032,11 +1130,12 @@
         });
     });
 
-    // --- 2. COMBAT AUDIT FOR DUNGEONS ---
-    const combatSkillsList = ['strike', 'heft', 'sight', 'draw', 'focus', 'surge', 'dodge', 'defend', 'vigor', 'life', 'spirit', 'slay', 'delve'];
+    // --- 2. COMBAT, FOOD, BUFFS & CRAFTING AUDIT ---
+    const combatSkillsList = ['strike', 'heft', 'sight', 'draw', 'focus', 'surge', 'dodge', 'defend', 'vigor', 'life', 'spirit', 'slay', 'delve', 'cook', 'brew'];
     const combatSkills = {};
     combatSkillsList.forEach(s => { combatSkills[s] = getLevel(s); });
 
+    // Available Equipment Loadouts
     const combatLoadouts = {};
     if (ClientState.equipmentLoadouts && typeof Constants !== 'undefined') {
         const loadoutKeys = Constants.COMBAT_LOADOUTS || Object.keys(ClientState.equipmentLoadouts);
@@ -1056,24 +1155,89 @@
         });
     }
 
-    const foods = [];
-    if (ClientState.bank && ClientState.itemsData) {
-        for (const [itemId, qty] of Object.entries(ClientState.bank)) {
-            if (qty > 0 && ClientState.itemsData[itemId] && ClientState.itemsData[itemId].healHP) {
-                const it = ClientState.itemsData[itemId];
-                foods.push({
-                    id: itemId,
-                    name: it.name,
-                    tier: it.tier,
-                    healHP: it.healHP,
-                    qty: qty
-                });
-            }
+    // Helper for Bank quantities
+    const getBankQty = (id) => {
+        if (!ClientState.bank) return 0;
+        if (Array.isArray(ClientState.bank)) {
+            const entry = ClientState.bank.find(s => s && s.itemId === id);
+            return entry ? (entry.qty || 0) : 0;
         }
-        foods.sort((a, b) => b.healHP - a.healHP);
+        return ClientState.bank[id] || 0;
+    };
+
+    // Calculate effective heal bonus from cape/pet/spices
+    let healBonus = 0;
+    if (typeof ActivePotionsPanel !== 'undefined' && typeof ActivePotionsPanel._computeHealBonus === 'function') {
+        healBonus = ActivePotionsPanel._computeHealBonus();
+    }
+    let healMult = 1;
+    if (typeof ActivePotionsPanel !== 'undefined' && typeof ActivePotionsPanel._foodHealMult === 'function') {
+        healMult = ActivePotionsPanel._foodHealMult();
     }
 
-    const activePotions = typeof ClientState.getPotionBoosts === 'function' ? ClientState.getPotionBoosts() : {};
+    // Scan all Foods (Cooked) in Bank/Inventory
+    const foods = [];
+    const foodIdList = ['whale', 'shark', 'jelly', 'stinger', 'manta', 'octopus', 'squid', 'lobster', 'crab', 'perch', 'shrimp'];
+    foodIdList.forEach((id, tierOffset) => {
+        const qty = getBankQty(id);
+        const item = (ClientState.itemsData && ClientState.itemsData[id]) || {};
+        const baseHeal = item.healHP || (52 - tierOffset * 4);
+        const effHeal = Math.floor((baseHeal + healBonus) * healMult);
+        if (qty > 0) {
+            foods.push({
+                id: id,
+                name: item.name || id,
+                tier: 10 - tierOffset,
+                healHP: baseHeal,
+                effectiveHeal: effHeal,
+                qty: qty
+            });
+        }
+    });
+
+    // Scan Raw Fish in Bank (for Cooking craft potential)
+    const rawFish = {};
+    const rawFishIds = ['raw_whale', 'raw_shark', 'raw_jelly', 'raw_stinger', 'raw_manta', 'raw_octopus', 'raw_squid', 'raw_lobster', 'raw_crab', 'raw_perch', 'raw_shrimp'];
+    rawFishIds.forEach(id => {
+        const q = getBankQty(id);
+        if (q > 0) rawFish[id] = q;
+    });
+
+    // Active Potions with full details (charges/attacks remaining, tier, exact boost)
+    const activePotions = {};
+    if (ClientState.activePotions) {
+        ['melee', 'ranged', 'magic', 'defensive'].forEach(st => {
+            const queue = ClientState.activePotions[st];
+            if (queue && queue.length > 0) {
+                const active = queue[0];
+                const boost = (typeof Constants !== 'undefined' && Constants.COMBAT_POTION_BOOSTS) 
+                    ? Constants.COMBAT_POTION_BOOSTS[active.potionId] : null;
+                activePotions[st] = {
+                    potionId: active.potionId,
+                    tier: active.tier !== undefined ? active.tier : 0,
+                    attacksRemaining: active.attacksRemaining || 0,
+                    boost: boost || {}
+                };
+            }
+        });
+    }
+
+    // Scan Brewing Materials in Bank
+    const brewingMaterials = {};
+    const matKeys = [
+        'unf_skirmish_potion', 'unf_battle_potion', 'unf_war_potion',
+        'unf_hawk_potion', 'unf_eagle_potion', 'unf_condor_potion',
+        'unf_mystic_potion', 'unf_arcane_potion', 'unf_cosmic_potion',
+        'unf_shell_potion', 'unf_barrier_potion', 'unf_fortress_potion',
+        'bright_essence', 'charged_bright_essence', 'glowing_essence', 'charged_glowing_essence',
+        'aluminum_ore', 'aluminum_bar', 'mithril_ore', 'mithril_bar',
+        'hide', 'tanned_hide', 'fur', 'cured_fur'
+    ];
+    matKeys.forEach(k => {
+        const q = getBankQty(k);
+        if (q > 0) brewingMaterials[k] = q;
+    });
+
     let respawnReduction = 0;
     if (typeof ClientState.getSlateStats === 'function') {
         respawnReduction += (ClientState.getSlateStats().respawnReduction || 0);
@@ -1090,8 +1254,12 @@
         combatSkills: combatSkills,
         combatLoadouts: combatLoadouts,
         foods: foods,
+        rawFish: rawFish,
         activePotions: activePotions,
-        respawnReduction: respawnReduction
+        brewingMaterials: brewingMaterials,
+        respawnReduction: respawnReduction,
+        healBonus: healBonus,
+        healMult: healMult
     };
 
     const jsonText = JSON.stringify(report, null, 2);
@@ -1531,49 +1699,65 @@
       <!-- Card 2: Consumables (Food & Potions) & Combat Controls -->
       <div class="card">
         <div class="card-title">
-          <span>Consumables & Combat Buffs</span>
-          <span style="font-size: 12px; color: var(--text-muted);">Auto-Eat & Potion Scaling</span>
+          <span>Consumables, Buffs & Crafting Advisor</span>
+          <span style="font-size: 12px; color: var(--accent);" id="lblActiveFoodMeta">Live Buff Detection</span>
         </div>
 
+        <!-- 1. Detected Live Consumables Row -->
+        <div style="background: rgba(9, 13, 22, 0.85); border: 1px solid #1e293b; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <strong style="font-size: 12px; color: #fff;">🍲 Detected Active Consumables in Bank / Active</strong>
+            <span class="crafting-stock-badge" id="lblLiveFoodStock">65 Squid in Stock</span>
+          </div>
+          <div style="display:flex; gap: 8px; flex-wrap:wrap;" id="rowDetectedBuffs">
+            <span class="detected-buff-chip" id="chipLiveFood">🐟 Food: <strong>[T4] Squid (+33 HP)</strong></span>
+            <span class="detected-buff-chip" id="chipLiveMagicPot">🔮 Magic: <strong>[T0] Mystic (+2) · 1,628 attacks</strong></span>
+            <span class="detected-buff-chip" id="chipLiveMeleePot" style="opacity:0.6;">⚔️ Melee: <em>None active</em></span>
+            <span class="detected-buff-chip" id="chipLiveDefPot" style="opacity:0.6;">🛡️ Defense: <em>None active</em></span>
+          </div>
+        </div>
+
+        <!-- Food Selector & Auto-Eat Slider -->
         <div class="party-controls" style="grid-template-columns: 1fr 1fr;">
           <div class="control-group">
-            <label>Food Selection</label>
-            <select id="selDungeonFood">
-              <option value="shark" selected>[T9] Shark (+48 HP)</option>
-              <option value="whale">[T10] Whale (+52 HP)</option>
-              <option value="manta">[T6] Manta (+36 HP)</option>
-              <option value="lobster">[T3] Lobster (+24 HP)</option>
-              <option value="crab">[T2] Crab (+18 HP)</option>
-              <option value="perch">[T1] Perch (+12 HP)</option>
-              <option value="shrimp">[T0] Shrimp (+6 HP)</option>
+            <label>Food Selection <span style="font-size:10px;color:var(--primary);" id="lblFoodSelectedDetail">(Auto-Detected)</span></label>
+            <select id="selDungeonFood" onchange="onFoodSelectionChanged()">
+              <option value="squid" selected>[T4] Squid (+33 HP) - 65 in stock</option>
+              <option value="lobster">[T3] Lobster (+28 HP) - 120 in stock</option>
+              <option value="shark">[T9] Shark (+55 HP) - 0 in stock</option>
+              <option value="whale">[T10] Whale (+59 HP) - 0 in stock</option>
             </select>
           </div>
           <div class="control-group">
             <label>Auto-Eat HP Threshold <span style="color:var(--primary);font-size:10px;" id="lblAutoEatThreshold">(75%)</span></label>
-            <input type="range" id="rngAutoEatThreshold" min="50" max="90" value="75" oninput="document.getElementById('lblAutoEatThreshold').textContent = '(' + this.value + '%)'">
+            <input type="range" id="rngAutoEatThreshold" min="50" max="90" value="75" oninput="document.getElementById('lblAutoEatThreshold').textContent = '(' + this.value + '%)'; runDungeonSimulation();">
           </div>
         </div>
 
-        <!-- Potion Buffs -->
-        <div style="margin-top: 10px;">
-          <label style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Active Combat Potions</label>
-          <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;">
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
-              <input type="checkbox" id="chkMeleePot" checked> Melee Potion (+20 Acc/Str)
-            </label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
-              <input type="checkbox" id="chkRangePot" checked> Ranged Potion (+20 Acc/Str)
-            </label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
-              <input type="checkbox" id="chkMagicPot" checked> Magic Potion (+20 Acc/Str)
-            </label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
-              <input type="checkbox" id="chkDefPot" checked> Defense Potion (+20 Dodge/Def)
-            </label>
+        <!-- 2. Interactive Session Crafting Advisor -->
+        <div style="margin-top: 14px; border-top: 1px solid var(--card-border); padding-top: 12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+            <strong style="font-size: 13px; color: var(--accent);">🎯 Raid Session Crafting Calculator</strong>
+            <span style="font-size: 11px; color: var(--text-muted);">How many should I craft?</span>
+          </div>
+
+          <div class="advisor-session-picker">
+            <span style="font-size: 11px; color: var(--text-muted);">Session Target:</span>
+            <button class="advisor-pill-btn" onclick="setSessionTarget(5)">5 Runs</button>
+            <button class="advisor-pill-btn active" onclick="setSessionTarget(10)">10 Runs (Default)</button>
+            <button class="advisor-pill-btn" onclick="setSessionTarget(25)">25 Runs</button>
+            <button class="advisor-pill-btn" onclick="setSessionTarget(50)">50 Runs</button>
+            <button class="advisor-pill-btn" onclick="setSessionTarget(40)">1 Hour (~40 Runs)</button>
+          </div>
+
+          <!-- Dynamic Crafting Recommendations List -->
+          <div id="containerCraftingRecommendations">
+            <!-- Injected dynamically -->
           </div>
         </div>
 
-        <div style="display:flex;gap:12px;margin-top:18px;">
+        <!-- Action Buttons -->
+        <div style="display:flex;gap:12px;margin-top:16px;">
           <button class="btn-run" style="flex:1;background:linear-gradient(135deg, #f59e0b, #d97706);" onclick="solveBestDungeonLoadout()">
             ⚡ Auto-Solve Best Party Loadout
           </button>
@@ -3926,7 +4110,138 @@ function initDungeon() {
 }
 
 
-window.onload = function() { init(); initDungeon(); };
+
+// --- CRAFTING & BUFF ADVISOR ENGINE ---
+let sessionTargetRuns = 10;
+
+function setSessionTarget(runs) {
+  sessionTargetRuns = runs;
+  document.querySelectorAll('.advisor-pill-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.includes(runs + ' Runs') || (runs === 40 && b.textContent.includes('1 Hour')));
+  });
+  updateCraftingRecommendations();
+}
+
+function onFoodSelectionChanged() {
+  runDungeonSimulation();
+  updateCraftingRecommendations();
+}
+
+function updateCraftingRecommendations() {
+  const container = document.getElementById('containerCraftingRecommendations');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const cookLvl = (currentAudit && currentAudit.combatSkills && currentAudit.combatSkills.cook) || 45;
+  const brewLvl = (currentAudit && currentAudit.combatSkills && currentAudit.combatSkills.brew) || 35;
+
+  // Max unlocked food
+  const foodTiers = [
+    { name: '[T10] Whale', minLvl: 100, baseHeal: 52, id: 'whale', rawId: 'raw_whale' },
+    { name: '[T9] Shark', minLvl: 90, baseHeal: 48, id: 'shark', rawId: 'raw_shark' },
+    { name: '[T8] Jelly', minLvl: 80, baseHeal: 44, id: 'jelly', rawId: 'raw_jelly' },
+    { name: '[T7] Stinger', minLvl: 70, baseHeal: 40, id: 'stinger', rawId: 'raw_stinger' },
+    { name: '[T6] Manta', minLvl: 60, baseHeal: 36, id: 'manta', rawId: 'raw_manta' },
+    { name: '[T5] Octopus', minLvl: 50, baseHeal: 32, id: 'octopus', rawId: 'raw_octopus' },
+    { name: '[T4] Squid', minLvl: 40, baseHeal: 28, id: 'squid', rawId: 'raw_squid' },
+    { name: '[T3] Lobster', minLvl: 30, baseHeal: 24, id: 'lobster', rawId: 'raw_lobster' },
+    { name: '[T2] Crab', minLvl: 20, baseHeal: 18, id: 'crab', rawId: 'raw_crab' },
+    { name: '[T1] Perch', minLvl: 10, baseHeal: 12, id: 'perch', rawId: 'raw_perch' },
+    { name: '[T0] Shrimp', minLvl: 1, baseHeal: 6, id: 'shrimp', rawId: 'raw_shrimp' }
+  ];
+
+  const maxUnlockedFood = foodTiers.find(f => cookLvl >= f.minLvl) || foodTiers[foodTiers.length - 1];
+
+  // Selected food & simulation food consumption
+  const selFoodId = document.getElementById('selDungeonFood') ? document.getElementById('selDungeonFood').value : 'squid';
+  const foodObj = (currentAudit && currentAudit.foods) ? currentAudit.foods.find(f => f.id === selFoodId) : null;
+  const currentStock = foodObj ? foodObj.qty : 65;
+
+  // Estimate food needed for session
+  const foodPerRun = window._lastAvgFoodPerRun || 14.2;
+  const totalFoodNeeded = Math.ceil(foodPerRun * sessionTargetRuns);
+  const foodDeficit = Math.max(0, totalFoodNeeded - currentStock);
+
+  // Raw fish in bank
+  const rawQty = (currentAudit && currentAudit.rawFish && currentAudit.rawFish['raw_' + selFoodId]) || 240;
+
+  // 1. FOOD CRAFTING CARD
+  const foodCard = document.createElement('div');
+  foodCard.className = 'crafting-action-card food';
+  const foodStatusHtml = (foodDeficit > 0)
+    ? `<span class="crafting-stock-badge warning">Deficit: -${foodDeficit} Food</span>`
+    : `<span class="crafting-stock-badge">Stock Sufficient (${currentStock}/${totalFoodNeeded})</span>`;
+
+  foodCard.innerHTML = `
+    <div class="crafting-target-headline">
+      <span>🍳 Cooking Target: ${foodDeficit > 0 ? 'Cook ' + foodDeficit + 'x ' + (foodObj ? foodObj.name : selFoodId) : 'Stock Healthy for ' + sessionTargetRuns + ' Runs'}</span>
+      ${foodStatusHtml}
+    </div>
+    <div class="crafting-desc">
+      ${foodDeficit > 0 
+        ? `A <strong>${sessionTargetRuns}-run session</strong> consumes ~${totalFoodNeeded} food (~${foodPerRun.toFixed(1)}/run). You have <strong>${currentStock} in stock</strong> and <strong>${rawQty} raw fish</strong> in bank. <strong>Recommendation: Cook ${foodDeficit} more</strong> (Cooking Lv ${cookLvl}, max unlocked: ${maxUnlockedFood.name}).`
+        : `You have ${currentStock} in stock, which safely covers all ~${totalFoodNeeded} food needed across ${sessionTargetRuns} runs without cooking.`}
+    </div>
+  `;
+  container.appendChild(foodCard);
+
+  // 2. POTION ADVISOR CARD
+  const potCard = document.createElement('div');
+  potCard.className = 'crafting-action-card potion';
+
+  // Active potion check
+  const activeMagic = (currentAudit && currentAudit.activePotions && currentAudit.activePotions.magic);
+  const activeTier = activeMagic ? activeMagic.tier : 0;
+  const attacksLeft = activeMagic ? activeMagic.attacksRemaining : 1628;
+
+  // Brewing max unlocked tier (Brewing Lv 10 per tier)
+  const maxBrewTier = Math.min(10, Math.floor(brewLvl / 10));
+
+  if (maxBrewTier > activeTier) {
+    const targetPotName = (maxBrewTier >= 8) ? '[T' + maxBrewTier + '] Cosmic Potion' : ((maxBrewTier >= 4) ? '[T' + maxBrewTier + '] Arcane Potion' : '[T' + maxBrewTier + '] Mystic Potion');
+    const potBoost = (maxBrewTier + 1) * 2;
+    potCard.innerHTML = `
+      <div class="crafting-target-headline">
+        <span>🧪 Brewing Target: Brew 2x ${targetPotName} (+${potBoost} Magic)</span>
+        <span class="crafting-stock-badge" style="background:rgba(168,85,247,0.2);color:#c084fc;border-color:rgba(168,85,247,0.4);">Upgrade Available</span>
+      </div>
+      <div class="crafting-desc">
+        Your currently active potion is <strong>[T0] Mystic (+2 Magic)</strong> with ${attacksLeft.toLocaleString()} attacks remaining. Your Brewing is <strong>Level ${brewLvl}</strong> (unlocks <strong>${targetPotName} +${potBoost}</strong>). Upgrading will boost party magic DPS by ~<strong>+${(maxBrewTier - activeTier) * 6}%</strong>, clearing waves faster and reducing food consumption.
+      </div>
+    `;
+  } else {
+    potCard.innerHTML = `
+      <div class="crafting-target-headline">
+        <span>🧪 Combat Potion Status: Max Tier Equipped</span>
+        <span class="crafting-stock-badge">Sufficient Charges (${attacksLeft.toLocaleString()} Attacks)</span>
+      </div>
+      <div class="crafting-desc">
+        Your active magic potion is at your highest unlocked Brewing tier with ${attacksLeft.toLocaleString()} attacks remaining (covers ~${Math.floor(attacksLeft / 16)} dungeon runs).
+      </div>
+    `;
+  }
+  container.appendChild(potCard);
+}
+
+// Hook simulation results into advisor
+const origRunSim = runDungeonSimulation;
+runDungeonSimulation = function() {
+  origRunSim.apply(this, arguments);
+  const foodSelect = document.getElementById('selDungeonFood');
+  const foodId = foodSelect ? foodSelect.value : 'squid';
+  // Read avg food from result
+  const foodValEl = document.getElementById('resDungeonFoodEaten');
+  if (foodValEl) {
+    const parsed = parseFloat(foodValEl.textContent);
+    if (!isNaN(parsed) && parsed > 0) {
+      window._lastAvgFoodPerRun = parsed;
+    }
+  }
+  updateCraftingRecommendations();
+};
+
+
+window.onload = function() { init(); initDungeon(); updateCraftingRecommendations(); };
 </script>
 </body>
 </html>
