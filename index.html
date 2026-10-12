@@ -615,6 +615,260 @@
       font-weight: 700;
       font-size: 11px;
     }
+  
+    /* Mode Navigation Tabs */
+    .main-mode-nav {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      background: rgba(18, 25, 41, 0.7);
+      padding: 6px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+    }
+
+    .mode-tab {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 20px;
+      border-radius: 8px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .mode-tab:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .mode-tab.active {
+      background: #1e293b;
+      color: #fff;
+      border-color: rgba(56, 189, 248, 0.5);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .mode-tab.active.dungeon {
+      border-color: rgba(245, 158, 11, 0.5);
+    }
+
+    /* Difficulty Pills */
+    .diff-selector-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0 16px 0;
+    }
+
+    .diff-btn {
+      background: #090d16;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .diff-btn:hover {
+      border-color: #475569;
+      color: #fff;
+    }
+
+    .diff-btn.active.feeble { background: rgba(34, 197, 94, 0.15); border-color: #22c55e; color: #4ade80; }
+    .diff-btn.active.dire { background: rgba(59, 130, 246, 0.15); border-color: #3b82f6; color: #60a5fa; }
+    .diff-btn.active.savage { background: rgba(245, 158, 11, 0.15); border-color: #f59e0b; color: #fbbf24; }
+    .diff-btn.active.fell { background: rgba(239, 68, 68, 0.15); border-color: #ef4444; color: #f87171; }
+    .diff-btn.active.ancient { background: rgba(168, 85, 247, 0.15); border-color: #a855f7; color: #c084fc; }
+    .diff-btn.active.chaos { background: rgba(244, 63, 94, 0.2); border-color: #f43f5e; color: #fb7185; }
+
+    /* Respawn Callout Box */
+    .respawn-meter-card {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 14px;
+    }
+
+    .respawn-stat-pill {
+      background: #060911;
+      border: 1px solid #1e293b;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: var(--mono);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Best Loadout Recommendation Banner */
+    .best-loadout-banner {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(168, 85, 247, 0.15));
+      border: 1px solid rgba(245, 158, 11, 0.5);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    .loadout-slots-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .loadout-slot-box {
+      background: rgba(9, 13, 22, 0.9);
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 12px;
+      position: relative;
+    }
+
+    .loadout-slot-box.host {
+      border-color: rgba(56, 189, 248, 0.6);
+      background: rgba(56, 189, 248, 0.06);
+    }
+
+    .loadout-slot-box .role-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .loadout-slot-box .loadout-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .loadout-slot-box .loadout-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    /* KPI Summary Cards */
+    .dungeon-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .dungeon-kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .dungeon-kpi-card.gold { border-color: rgba(245, 158, 11, 0.4); }
+    .dungeon-kpi-card.green { border-color: rgba(16, 185, 129, 0.4); }
+    .dungeon-kpi-card.blue { border-color: rgba(56, 189, 248, 0.4); }
+    .dungeon-kpi-card.purple { border-color: rgba(168, 85, 247, 0.4); }
+
+    .dungeon-kpi-val {
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+      margin: 4px 0;
+      font-family: var(--mono);
+    }
+
+    .dungeon-kpi-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Wave Breakdown Table */
+    .dungeon-wave-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .dungeon-wave-table th {
+      background: #090d16;
+      color: var(--text-muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .dungeon-wave-table td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+    }
+
+    .enemy-chips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .enemy-chip {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid #1e293b;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .enemy-weakness-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: rgba(56, 189, 248, 0.2);
+      color: var(--primary);
+    }
+
+    .style-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      text-transform: capitalize;
+      display: inline-block;
+    }
+    .style-pill.slash { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .style-pill.crush { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .style-pill.stab { background: rgba(234, 179, 8, 0.2); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.4); }
+    .style-pill.range { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }
+    .style-pill.magic { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }
+
   </style>
 </head>
 <body>
@@ -642,6 +896,16 @@
     </a>
   </div>
 
+  <!-- Mode Navigation Tabs: Fortress Skilling vs Dungeon Combat -->
+  <div class="main-mode-nav">
+    <button class="mode-tab active" id="tabModeFortress" onclick="switchMainTab('fortress')">
+      <span style="font-size: 18px;">🏰</span> Fortress Skilling Simulator & Comp Optimizer
+    </button>
+    <button class="mode-tab dungeon" id="tabModeDungeon" onclick="switchMainTab('dungeon')">
+      <span style="font-size: 18px;">⚔️</span> Dungeon Combat Simulator & Party Optimizer
+    </button>
+  </div>
+
   <!-- Step 1: Console Snippet & Instructions -->
   <div class="grid-2">
     <div class="card">
@@ -664,6 +928,7 @@
         return;
     }
 
+    // --- 1. FORTRESS SKILLING AUDIT ---
     const roles = [
         { id: 'fish',   gather: 'fish',   process: 'cook',  stat: 'Health',       gatherNodeId: 'gauntlet_fish',   processNodeId: 'gauntlet_cook' },
         { id: 'mine',   gather: 'mine',   process: 'smith', stat: 'Melee Force',  gatherNodeId: 'gauntlet_mine',   processNodeId: 'gauntlet_smith' },
@@ -699,204 +964,59 @@
         const vigorLvl = (ClientState.skills && ClientState.skills.vigor && ClientState.skills.vigor.level) || 1;
         const vigorRed = (typeof Constants !== 'undefined' && Constants.vigorActionReduction)
             ? Constants.vigorActionReduction(vigorLvl)
-            : (vigorLvl + 1) * 0.005;
-        const minDur = (typeof Constants !== 'undefined' && Constants.MIN_ACTION_DURATION) || 2.0;
-        return Math.max(minDur, base - vigorRed);
-    };
-
-    const getDepositVal = (tier) => {
-        if (typeof Constants !== 'undefined' && Constants.gauntletDepositValue) return Constants.gauntletDepositValue(tier);
-        return Math.round(2 * Math.pow(1.35, tier));
-    };
-
-    const satchelCount = (ClientState.unlocks && ClientState.unlocks.satchels) 
-        ? Object.keys(ClientState.unlocks.satchels).filter(k => ClientState.unlocks.satchels[k]).length : 0;
-    const bagSize = (typeof Constants !== 'undefined' && Constants.INVENTORY_SLOTS ? Constants.INVENTORY_SLOTS : 28) 
-        + satchelCount * (typeof Constants !== 'undefined' && Constants.SATCHEL_SLOTS_PER ? Constants.SATCHEL_SLOTS_PER : 4);
-
-    const calcArenaWalkDistance = (roleDef) => {
-        try {
-            if (typeof ClientState.getPathDistance === 'function') {
-                const d1 = ClientState.getPathDistance('gauntlet_raid', roleDef.gatherNodeId);
-                const d2 = ClientState.getPathDistance(roleDef.gatherNodeId, roleDef.processNodeId);
-                const d3 = ClientState.getPathDistance(roleDef.processNodeId, 'gauntlet_raid');
-                if (d1 > 0 && d2 > 0 && d3 > 0) return Math.round(d1 + d2 + d3);
-            }
-            const nodes = ClientState.nodesData || [];
-            const byId = {};
-            for (let i = 0; i < nodes.length; i++) byId[nodes[i].id] = nodes[i];
-            const center = byId['gauntlet_raid'];
-            const gNode = byId[roleDef.gatherNodeId];
-            const pNode = byId[roleDef.processNodeId];
-            if (center && gNode && pNode) {
-                const d = (a, b) => Math.hypot(a.position.x - b.position.x, a.position.y - b.position.y);
-                return Math.round(d(center, gNode) + d(gNode, pNode) + d(pNode, center));
-            }
-        } catch(e) {}
-        return 610;
-    };
-
-    const calcLiveMovementSpeed = () => {
-        const vigorLevel = (ClientState.skills && ClientState.skills.vigor && ClientState.skills.vigor.level) || 1;
-        let vigorEffLevel = vigorLevel;
-        if (typeof EffectiveLevel !== 'undefined' && typeof EffectiveLevel.compute === 'function') {
-            try {
-                const vigorEff = EffectiveLevel.compute({
-                    level: vigorLevel,
-                    pets: ClientState.pets,
-                    capes: ClientState.capes,
-                    tools: ClientState.unlocks && ClientState.unlocks.tools
-                });
-                if (vigorEff && vigorEff.effective) vigorEffLevel = vigorEff.effective;
-            } catch(e) {}
-        }
-
-        const unl = ClientState.unlocks || {};
-        const relics = unl.relics || {};
-        let telBonus = 0;
-        const telPer = (typeof Constants !== 'undefined' && Constants.TELESCOPE_MOVE_SPEED_BONUS_PER) || 0.005;
-        const telShinyPer = (typeof Constants !== 'undefined' && Constants.TELESCOPE_SHINY_MOVE_SPEED_BONUS_PER) || 0.01;
-        for (let t = 0; t <= 10; t++) {
-            if (relics['telescope_t' + t]) telBonus += telPer;
-            if (relics['shiny_telescope_t' + t]) telBonus += telShinyPer;
-        }
-
-        const beacons = unl.beacons || {};
-        let beaconBonus = 0;
-        const bTiers = (typeof Constants !== 'undefined' && Constants.GAUNTLET_RARE_TIER_KEYS) || ['feeble','dire','savage','fell','ancient','chaos','cataclysm'];
-        for (let b = 0; b < bTiers.length; b++) {
-            if (beacons['beacon_swift_' + bTiers[b]]) {
-                beaconBonus += (typeof Constants !== 'undefined' && typeof Constants.swiftBeaconMoveBonus === 'function')
-                    ? Constants.swiftBeaconMoveBonus(b) : 0.01 * (b + 1);
-            }
-        }
-
-        const compasses = unl.compasses || {};
-        let compassCount = 0;
-        for (let c = 0; c <= 10; c++) {
-            if (compasses['enchanted_compass_t' + c]) compassCount++;
-        }
-        const compassBonus = compassCount * ((typeof Constants !== 'undefined' && Constants.COMPASS_MOVE_SPEED_BONUS_PER) || 0.005);
-
-        let gauntBonus = 0;
-        const banners = unl.banners || {};
-        const ledgers = unl.ledgers || {};
-        for (let g = 0; g < bTiers.length; g++) {
-            if (typeof Constants !== 'undefined' && typeof Constants.gauntletMilestoneMoveBonus === 'function') {
-                if (banners['gauntlet_banner_' + bTiers[g]]) gauntBonus += Constants.gauntletMilestoneMoveBonus(g);
-                if (ledgers['gauntlet_ledger_' + bTiers[g]]) gauntBonus += Constants.gauntletMilestoneMoveBonus(g);
-            }
-        }
-
-        let talentBonus = 0;
-        if (window.RaidTreeEffects && ClientState.raidTrees) {
-            try {
-                const mte = window.RaidTreeEffects.sumEffects({
-                    delve: [],
-                    fortify: (ClientState.raidTrees.fortify && ClientState.raidTrees.fortify.allocated) || []
-                });
-                talentBonus = (mte && mte.moveSpeedPct ? mte.moveSpeedPct / 100 : 0);
-            } catch(e) {}
-        }
-
-        const collectorBonus = ((typeof ClientState.getCollectorProgress === 'function' ? ClientState.getCollectorProgress() : 0)
-            * ((typeof Constants !== 'undefined' && Constants.COLLECTOR_MAX_MOVE_SPEED) || 0.05));
-        let potionMult = 0;
-        if (ClientState.activePotions && ClientState.activePotions.movement && ClientState.activePotions.movement.length > 0) {
-            const potId = ClientState.activePotions.movement[0].potionId;
-            if (typeof Constants !== 'undefined' && Constants.MOVEMENT_POTION_LOOKUP && Constants.MOVEMENT_POTION_LOOKUP[potId]) {
-                potionMult = Constants.MOVEMENT_POTION_LOOKUP[potId].speedMultiplier || 0;
-            }
-        }
-
-        // If player is currently in the Fortress raid lobby, read exact server steps/sec directly
-        if (ClientState.raidLobby && ClientState.raidLobby.members) {
-            const me = ClientState.raidLobby.members.find(m => m.playerId === ClientState.playerId);
-            if (me && me.move) {
-                if (me.move.stepsWithPotion != null) return Number(me.move.stepsWithPotion.toFixed(1));
-                if (me.move.steps != null) return Number(me.move.steps.toFixed(1));
-            }
-        }
-
-        const ancientBonus = (typeof ClientState.getShardSetMoveSpeedBonus === 'function')
-            ? ClientState.getShardSetMoveSpeedBonus()
             : 0;
-
-        const mvOpts = {
-            vigorLevel: vigorEffLevel,
-            telescope: telBonus,
-            compass: compassBonus,
-            gauntlet: gauntBonus,
-            beacon: beaconBonus,
-            collector: collectorBonus,
-            ancient: ancientBonus,
-            talent: talentBonus,
-            potionMult: potionMult
-        };
-
-        if (typeof Constants !== 'undefined' && typeof Constants.totalMovementSpeed === 'function') {
-            return Number(Constants.totalMovementSpeed(mvOpts).toFixed(1));
-        }
-        if (typeof Constants !== 'undefined' && typeof Constants.movementSpeed === 'function') {
-            return Number(Constants.movementSpeed(vigorEffLevel).toFixed(1));
-        }
-        return Number((10 + (vigorEffLevel + 1) * (0.1 + 0.0005 * vigorEffLevel)).toFixed(1));
+        return Math.max(2.0, base - vigorRed);
     };
 
-    const hostSpeed = calcLiveMovementSpeed();
-    const cloneMult = (typeof Constants !== 'undefined' && Constants.GAUNTLET_CLONE_MOVE_MULT) ? Constants.GAUNTLET_CLONE_MOVE_MULT : 0.9;
-    const cloneSpeed = Number((hostSpeed * cloneMult).toFixed(1));
+    const bagSize = (typeof ClientState.getBagCapacity === 'function') ? ClientState.getBagCapacity() : 28;
+    const baseWalkSpeed = (typeof Constants !== 'undefined' && Constants.BASE_MOVEMENT_SPEED) ? Constants.BASE_MOVEMENT_SPEED : 3.0;
+    const trainersBonus = (typeof ClientState.getTrainersMoveSpeedBonus === 'function') ? ClientState.getTrainersMoveSpeedBonus() : 0;
+    const beaconBonus = (typeof ClientState.getBeaconMoveSpeedBonus === 'function') ? ClientState.getBeaconMoveSpeedBonus() : 0;
+    const ancientBonus = (typeof ClientState.getShardSetMoveSpeedBonus === 'function') ? ClientState.getShardSetMoveSpeedBonus() : 0;
+    const liveHostSpeed = baseWalkSpeed + trainersBonus + beaconBonus + ancientBonus;
+    const liveCloneSpeed = liveHostSpeed * 0.9;
 
-    const report = {
-        player: ClientState.playerName || 'Player',
-        partySize: 5,
-        bagCapacity: bagSize,
-        hostSpeed: hostSpeed,
-        cloneSpeed: cloneSpeed,
-        haste: haste,
-        walkDistance: 610,
-        skills: ClientState.skills,
-        roles: []
-    };
-
+    const roleData = [];
     roles.forEach(r => {
-        const gLvl = getLevel(r.gather);
-        const pLvl = getLevel(r.process);
-        const tier = getTier(Math.min(gLvl, pLvl));
+        const pairLevel = getLevel(r.gather) + getLevel(r.process);
+        const tier = getTier(pairLevel);
         const reqLvl = getReqLevel(tier);
-        const gSuccess = getSuccess(r.gather, reqLvl);
-        const pSuccess = getSuccess(r.process, reqLvl);
-        const gDouble = getDoubleOrSave(r.gather, 1);
-        const pSave = getDoubleOrSave(r.process, 1);
-        const gRawDuration = getDuration(r.gather, 1);
-        const pRawDuration = getDuration(r.process, 1);
-        const gActionTime = Number((gRawDuration / haste).toFixed(3));
-        const pActionTime = Number((pRawDuration / haste).toFixed(3));
-        const tierVal = getDepositVal(tier);
-        const walkDist = calcArenaWalkDistance(r);
+        const tierVal = (typeof Constants !== 'undefined' && Constants.GAUNTLET_TIER_STAT_VALUES) 
+            ? (Constants.GAUNTLET_TIER_STAT_VALUES[tier] || (tier + 2)) 
+            : (tier === 0 ? 2 : tier + 2);
 
-        const effectiveConversion = Math.min(1, pSuccess / (1 - pSave * pSuccess));
-        const expectedItems = Number((bagSize * effectiveConversion).toFixed(1));
-        const expectedStat = Number((expectedItems * tierVal).toFixed(1));
+        const gRate = getSuccess(r.gather, reqLvl);
+        const pRate = getSuccess(r.process, reqLvl);
+        const gDouble = getDoubleOrSave(r.gather, reqLvl);
+        const pSave = getDoubleOrSave(r.process, reqLvl);
+        const gActionTime = Number((getDuration(r.gather, reqLvl) / haste).toFixed(3));
+        const pActionTime = Number((getDuration(r.process, reqLvl) / haste).toFixed(3));
 
-        // Cycle time breakdown
-        const attemptsGather = bagSize / (gSuccess * (1 + gDouble));
-        const gatherTime = attemptsGather * gActionTime;
-        const attemptsProcess = bagSize / Math.max(0.01, 1 - pSave * pSuccess);
-        const processTime = attemptsProcess * pActionTime;
-        const walkTimeHost = walkDist / hostSpeed;
-        const cycleTimeHost = Number((walkTimeHost + gatherTime + processTime).toFixed(1));
+        const gatherItemsPerAction = 1 + gDouble;
+        const gatherAttempts = bagSize / (gRate * gatherItemsPerAction);
+        const gatherTime = gatherAttempts * gActionTime;
+        const processItemsConsPerAction = 1 - pSave;
+        const processAttempts = bagSize / processItemsConsPerAction;
+        const processTime = processAttempts * pActionTime;
+        const expectedItems = bagSize * pRate;
+        const expectedStat = expectedItems * tierVal;
 
-        report.roles.push({
+        const walkDist = (typeof Constants !== 'undefined' && Constants.GAUNTLET_NODES && Constants.GAUNTLET_NODES[r.gatherNodeId]) 
+            ? Constants.GAUNTLET_NODES[r.gatherNodeId].walkDist 
+            : 300;
+        const transitHost = (walkDist * 2) / liveHostSpeed;
+        const cycleTimeHost = Number((gatherTime + processTime + transitHost).toFixed(1));
+
+        roleData.push({
             role: r.stat,
             gatherSkill: r.gather,
-            gatherLevel: gLvl,
-            gatherSuccessPct: Number((gSuccess * 100).toFixed(1)),
+            gatherLevel: getLevel(r.gather),
+            gatherSuccessPct: Number((gRate * 100).toFixed(1)),
             gatherDoublePct: Number((gDouble * 100).toFixed(1)),
             gatherActionTime: gActionTime,
             processSkill: r.process,
-            processLevel: pLvl,
-            processSuccessPct: Number((pSuccess * 100).toFixed(1)),
+            processLevel: getLevel(r.process),
+            processSuccessPct: Number((pRate * 100).toFixed(1)),
             processSavePct: Number((pSave * 100).toFixed(1)),
             processActionTime: pActionTime,
             activeTier: tier,
@@ -912,19 +1032,73 @@
         });
     });
 
+    // --- 2. COMBAT AUDIT FOR DUNGEONS ---
+    const combatSkillsList = ['strike', 'heft', 'sight', 'draw', 'focus', 'surge', 'dodge', 'defend', 'vigor', 'life', 'spirit', 'slay', 'delve'];
+    const combatSkills = {};
+    combatSkillsList.forEach(s => { combatSkills[s] = getLevel(s); });
+
+    const combatLoadouts = {};
+    if (ClientState.equipmentLoadouts && typeof Constants !== 'undefined') {
+        const loadoutKeys = Constants.COMBAT_LOADOUTS || Object.keys(ClientState.equipmentLoadouts);
+        loadoutKeys.forEach(k => {
+            const eq = ClientState.equipmentLoadouts[k];
+            if (eq && Object.values(eq).some(Boolean)) {
+                const stats = typeof ClientState.computeLoadoutStats === 'function' ? ClientState.computeLoadoutStats(k) : null;
+                const name = typeof ClientState.loadoutName === 'function' ? ClientState.loadoutName(k) : k;
+                const resolvedStyle = typeof ClientState.getResolvedCombatStyle === 'function' ? ClientState.getResolvedCombatStyle(k) : (stats ? stats.attackStyle : 'melee');
+                combatLoadouts[k] = {
+                    id: k,
+                    name: name,
+                    style: resolvedStyle,
+                    stats: stats || {}
+                };
+            }
+        });
+    }
+
+    const foods = [];
+    if (ClientState.bank && ClientState.itemsData) {
+        for (const [itemId, qty] of Object.entries(ClientState.bank)) {
+            if (qty > 0 && ClientState.itemsData[itemId] && ClientState.itemsData[itemId].healHP) {
+                const it = ClientState.itemsData[itemId];
+                foods.push({
+                    id: itemId,
+                    name: it.name,
+                    tier: it.tier,
+                    healHP: it.healHP,
+                    qty: qty
+                });
+            }
+        }
+        foods.sort((a, b) => b.healHP - a.healHP);
+    }
+
+    const activePotions = typeof ClientState.getPotionBoosts === 'function' ? ClientState.getPotionBoosts() : {};
+    let respawnReduction = 0;
+    if (typeof ClientState.getSlateStats === 'function') {
+        respawnReduction += (ClientState.getSlateStats().respawnReduction || 0);
+    }
+
+    const report = {
+        player: ClientState.playerName || 'Player',
+        partySize: 5,
+        bagCapacity: bagSize,
+        hostSpeed: liveHostSpeed,
+        cloneSpeed: liveCloneSpeed,
+        haste: haste,
+        roles: roleData,
+        combatSkills: combatSkills,
+        combatLoadouts: combatLoadouts,
+        foods: foods,
+        activePotions: activePotions,
+        respawnReduction: respawnReduction
+    };
+
     const jsonText = JSON.stringify(report, null, 2);
     window.__fortressData = report;
     window.__fortressJson = jsonText;
 
     let copied = false;
-
-    // 1. Remove any lingering floating pill element if present
-    try {
-        const oldPill = document.getElementById('fortress-copy-pill');
-        if (oldPill) oldPill.remove();
-    } catch (e) {}
-
-    // 2. Try DevTools native copy() command
     try {
         if (typeof copy === 'function') {
             copy(jsonText);
@@ -932,31 +1106,13 @@
         }
     } catch (e) {}
 
-    // 3. Try classic off-screen execCommand
-    if (!copied) {
-        try {
-            const ta = document.createElement('textarea');
-            ta.value = jsonText;
-            ta.style.position = 'fixed';
-            ta.style.left = '-9999px';
-            document.body.appendChild(ta);
-            ta.focus();
-            ta.select();
-            copied = document.execCommand('copy');
-            document.body.removeChild(ta);
-        } catch (e) {}
-    }
-
-    // 4. Try modern navigator.clipboard with safe .catch()
     if (!copied && navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(jsonText).then(() => {
-            copied = true;
-        }).catch(() => {});
+        navigator.clipboard.writeText(jsonText).then(() => { copied = true; }).catch(() => {});
     }
 
     console.table(report.roles);
     if (copied) {
-        console.log("%c>>> Auto-copied to clipboard! Paste into the Fortress Simulator! <<<", "color: #5cb85c; font-weight: bold; font-size: 13px;");
+        console.log("%c>>> Auto-copied to clipboard! Paste into the Simulator! <<<", "color: #5cb85c; font-weight: bold; font-size: 13px;");
     } else {
         console.log("%c>>> To copy to clipboard, type: copy(__fortressJson) and press Enter <<<", "color: #38bdf8; font-weight: bold; font-size: 13px;");
     }
@@ -1023,7 +1179,8 @@
     </div>
   </div>
 
-  <!-- Hero Results Cards -->
+  <div id="view-fortress">
+<!-- Hero Results Cards -->
   <div class="hero-results" id="heroResults">
     <div class="hero-stat-card gold">
       <div class="hero-stat-label">Max Wave Achieved</div>
@@ -1300,6 +1457,253 @@
       </table>
     </div>
   </div>
+
+</div>
+
+
+  <!-- ========================================================================= -->
+  <!-- VIEW: DUNGEON COMBAT SIMULATOR & PARTY LOADOUT OPTIMIZER                  -->
+  <!-- ========================================================================= -->
+  <div id="view-dungeon" style="display: none;">
+    <!-- Dungeon Config Cards -->
+    <div class="grid-2">
+      <!-- Card 1: Dungeon Tier & Clone Penalty Mechanics -->
+      <div class="card">
+        <div class="card-title">
+          <span>Dungeon Tier & Party Mechanics</span>
+          <span style="font-size: 12px; color: var(--accent);" id="lblDungeonTierMeta">Feeble Dungeon (Tier 1)</span>
+        </div>
+
+        <label style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Select Dungeon Difficulty</label>
+        <div class="diff-selector-row">
+          <button class="diff-btn active feeble" onclick="setDungeonDifficulty('feeble')">Feeble (T1)</button>
+          <button class="diff-btn dire" onclick="setDungeonDifficulty('dire')">Dire (T2)</button>
+          <button class="diff-btn savage" onclick="setDungeonDifficulty('savage')">Savage (T3)</button>
+          <button class="diff-btn fell" onclick="setDungeonDifficulty('fell')">Fell (T4)</button>
+          <button class="diff-btn ancient" onclick="setDungeonDifficulty('ancient')">Ancient (T5)</button>
+          <button class="diff-btn chaos" onclick="setDungeonDifficulty('chaos')">Chaos (T6)</button>
+        </div>
+
+        <div class="party-controls" style="grid-template-columns: 1fr 1fr;">
+          <div class="control-group">
+            <label>Party Size</label>
+            <select id="selDungeonPartySize" onchange="onDungeonPartySizeChanged()">
+              <option value="5" selected>5 (Host + 4 Clones)</option>
+              <option value="4">4 (Host + 3 Clones)</option>
+              <option value="3">3 (Host + 2 Clones)</option>
+              <option value="2">2 (Host + 1 Clone)</option>
+              <option value="1">1 (Solo Host)</option>
+            </select>
+          </div>
+          <div class="control-group" id="groupChaosReset" style="display:none;">
+            <label>Chaos Reset Ladder</label>
+            <select id="selChaosReset">
+              <option value="0" selected>Endless (No Reset)</option>
+              <option value="21">Reset Wave 21</option>
+              <option value="41">Reset Wave 41</option>
+              <option value="61">Reset Wave 61</option>
+              <option value="81">Reset Wave 81</option>
+              <option value="101">Reset Wave 101</option>
+              <option value="121">Reset Wave 121</option>
+              <option value="141">Reset Wave 141</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Clone Respawn Penalty Tracker -->
+        <div class="respawn-meter-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <strong style="font-size:13px;color:#fff;">⏱️ Wave Respawn Delay Mechanics</strong>
+            <span style="font-size:11px;color:var(--accent);font-family:var(--mono);">RAID_CLONE_RESPAWN_PENALTY: +1s/clone</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <div class="respawn-stat-pill">Base: <strong style="color:#fff;">10.0s</strong></div>
+            <div class="respawn-stat-pill">Host Perks: <strong style="color:var(--success);" id="lblHostRespawnReduction">-0.0s</strong></div>
+            <div class="respawn-stat-pill">Clones Penalty: <strong style="color:var(--danger);" id="lblClonesRespawnPenalty">+4.0s</strong></div>
+            <div class="respawn-stat-pill">Net Wave Delay: <strong style="color:var(--primary);" id="lblNetRespawnDelay">10.0s</strong></div>
+          </div>
+          <p style="font-size:11px;color:var(--text-muted);margin-top:8px;line-height:1.4;">
+            Each clone added to the party adds <strong>+1.0s</strong> wave respawn delay. Clones massively boost team DPS, but add wave transition downtime across the run.
+          </p>
+        </div>
+      </div>
+
+      <!-- Card 2: Consumables (Food & Potions) & Combat Controls -->
+      <div class="card">
+        <div class="card-title">
+          <span>Consumables & Combat Buffs</span>
+          <span style="font-size: 12px; color: var(--text-muted);">Auto-Eat & Potion Scaling</span>
+        </div>
+
+        <div class="party-controls" style="grid-template-columns: 1fr 1fr;">
+          <div class="control-group">
+            <label>Food Selection</label>
+            <select id="selDungeonFood">
+              <option value="shark" selected>[T9] Shark (+48 HP)</option>
+              <option value="whale">[T10] Whale (+52 HP)</option>
+              <option value="manta">[T6] Manta (+36 HP)</option>
+              <option value="lobster">[T3] Lobster (+24 HP)</option>
+              <option value="crab">[T2] Crab (+18 HP)</option>
+              <option value="perch">[T1] Perch (+12 HP)</option>
+              <option value="shrimp">[T0] Shrimp (+6 HP)</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label>Auto-Eat HP Threshold <span style="color:var(--primary);font-size:10px;" id="lblAutoEatThreshold">(75%)</span></label>
+            <input type="range" id="rngAutoEatThreshold" min="50" max="90" value="75" oninput="document.getElementById('lblAutoEatThreshold').textContent = '(' + this.value + '%)'">
+          </div>
+        </div>
+
+        <!-- Potion Buffs -->
+        <div style="margin-top: 10px;">
+          <label style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Active Combat Potions</label>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;">
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
+              <input type="checkbox" id="chkMeleePot" checked> Melee Potion (+20 Acc/Str)
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
+              <input type="checkbox" id="chkRangePot" checked> Ranged Potion (+20 Acc/Str)
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
+              <input type="checkbox" id="chkMagicPot" checked> Magic Potion (+20 Acc/Str)
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
+              <input type="checkbox" id="chkDefPot" checked> Defense Potion (+20 Dodge/Def)
+            </label>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-top:18px;">
+          <button class="btn-run" style="flex:1;background:linear-gradient(135deg, #f59e0b, #d97706);" onclick="solveBestDungeonLoadout()">
+            ⚡ Auto-Solve Best Party Loadout
+          </button>
+          <button class="btn-run" style="flex:1;" onclick="runDungeonSimulation()">
+            ▶️ Run Combat Simulation (100 Runs)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Best Loadout Recommendation Banner -->
+    <div class="best-loadout-banner" id="bannerBestLoadout">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <div>
+          <span class="header-badge" style="background:rgba(245,158,11,0.25);border-color:rgba(245,158,11,0.6);">RECOMMENDED OPTIMAL LOADOUT</span>
+          <h2 style="font-size: 20px; color: #fff; margin-top: 4px;">Top Performing Party Loadout for <span id="lblBestDiffName">Feeble Dungeon</span></h2>
+        </div>
+        <button class="btn-copy" style="position:static;" onclick="applyBestLoadoutToParty()">
+          <span>Equip to Party Slots &darr;</span>
+        </button>
+      </div>
+
+      <!-- 5 Party Slot Boxes -->
+      <div class="loadout-slots-grid" id="gridBestLoadoutSlots">
+        <!-- Injected dynamically -->
+      </div>
+
+      <div style="background:rgba(9,13,22,0.7);padding:12px 16px;border-radius:8px;border:1px solid rgba(245,158,11,0.3);margin-top:10px;">
+        <strong style="color:var(--accent);font-size:13px;">🧠 Strategic Loadout Rationale:</strong>
+        <p style="font-size:12px;color:var(--text-main);margin-top:4px;line-height:1.5;" id="lblStrategicRationale">
+          Analyzing enemy defenses and attack styles across all waves...
+        </p>
+      </div>
+    </div>
+
+    <!-- Dungeon KPI Summary Grid -->
+    <div class="dungeon-kpi-grid">
+      <div class="dungeon-kpi-card gold">
+        <div class="dungeon-kpi-sub">Completion Probability</div>
+        <div class="dungeon-kpi-val" id="resDungeonWinRate" style="color:var(--accent);">--%</div>
+        <div class="dungeon-kpi-sub" id="resDungeonClearStatus">Awaiting simulation...</div>
+      </div>
+      <div class="dungeon-kpi-card green">
+        <div class="dungeon-kpi-sub">Expected Waves Cleared</div>
+        <div class="dungeon-kpi-val" id="resDungeonWavesCleared" style="color:var(--success);">-- / --</div>
+        <div class="dungeon-kpi-sub" id="resDungeonWaveProgress">Wave survival progression</div>
+      </div>
+      <div class="dungeon-kpi-card blue">
+        <div class="dungeon-kpi-sub">Total Time to Clear (TTK)</div>
+        <div class="dungeon-kpi-val" id="resDungeonTTK" style="color:var(--primary);">--</div>
+        <div class="dungeon-kpi-sub" id="resDungeonTimeBreakdown">Combat vs Respawn Delays</div>
+      </div>
+      <div class="dungeon-kpi-card purple">
+        <div class="dungeon-kpi-sub">Food Consumed / Run</div>
+        <div class="dungeon-kpi-val" id="resDungeonFoodEaten" style="color:#c084fc;">--</div>
+        <div class="dungeon-kpi-sub" id="resDungeonFoodPerHour">~-- food / hour</div>
+      </div>
+    </div>
+
+    <!-- Party Loadout Selectors Table (Custom Slot Tweaks) -->
+    <div class="card" style="margin-bottom: 24px;">
+      <div class="card-title">
+        <span>Party Loadout Setup (Host & Clones)</span>
+        <span style="font-size: 12px; color: var(--text-muted);">Adjust individual combat styles</span>
+      </div>
+      <div class="loadout-slots-grid" id="gridManualPartySlots">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+
+    <!-- Wave-by-Wave Breakdown Table -->
+    <div class="card" style="margin-bottom: 24px;">
+      <div class="card-title">
+        <span>Dungeon Wave-by-Wave Breakdown & Combat Log</span>
+        <span style="font-size: 12px; color: var(--text-muted);" id="lblWaveTableSub">5 Monsters per wave · Random targeting mechanics</span>
+      </div>
+      <div style="overflow-x: auto;">
+        <table class="dungeon-wave-table">
+          <thead>
+            <tr>
+              <th style="width: 80px;">Wave</th>
+              <th>Monsters Encountered (5 per wave)</th>
+              <th>Enemy Attack Styles</th>
+              <th>Vulnerabilities (Lowest Def)</th>
+              <th style="width: 110px;">Avg Wave TTK</th>
+              <th style="width: 120px;">Food Eaten</th>
+              <th style="width: 110px;">Wave Survival</th>
+            </tr>
+          </thead>
+          <tbody id="tblDungeonWavesBody">
+            <tr>
+              <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                Select a difficulty above and run the simulation to see wave combat details.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Enemy Intel Roster -->
+    <div class="card">
+      <div class="card-title">
+        <span>Dungeon Enemy Intel & Threat Analysis</span>
+        <span style="font-size: 12px; color: var(--text-muted);">Monster defense ratings and attack profiles</span>
+      </div>
+      <div style="overflow-x: auto;">
+        <table class="dungeon-wave-table" id="tblEnemyIntel">
+          <thead>
+            <tr>
+              <th>Monster Name</th>
+              <th>Max HP</th>
+              <th>Attack Style</th>
+              <th>Atk Speed</th>
+              <th>Stab Def</th>
+              <th>Slash Def</th>
+              <th>Crush Def</th>
+              <th>Range Def</th>
+              <th>Magic Def</th>
+              <th>Primary Weakness</th>
+            </tr>
+          </thead>
+          <tbody id="tblEnemyIntelBody">
+            <!-- Injected dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -2796,7 +3200,733 @@ function renderPartyContribution(players) {
   tbody.appendChild(totalTr);
 }
 
-window.onload = init;
+
+// =========================================================================
+// DUNGEON COMBAT ENGINE & OPTIMIZER SCRIPT
+// =========================================================================
+const DUNGEON_DATA = {"feeble": {"id": "feeble", "name": "Feeble Dungeon", "slayLevel": 10, "delveLevel": 0, "endless": false, "waves": [["feeble_acid_slime", "feeble_rage_slime", "feeble_spike_slime", "feeble_flame_slime", "feeble_frost_slime"], ["feeble_boom_slime", "feeble_spark_slime", "feeble_rat", "feeble_mushroom", "feeble_ember_slime"], ["feeble_ember_slime", "feeble_boom_slime", "slime_boss", "feeble_spike_slime", "feeble_flame_slime"], ["feeble_zombie", "feeble_golem", "feeble_plant", "feeble_ent", "feeble_goblin"], ["feeble_plant", "feeble_imp", "feeble_imp", "feeble_imp", "feeble_skeleton"]]}, "dire": {"id": "dire", "name": "Dire Dungeon", "slayLevel": 30, "delveLevel": 30, "endless": false, "waves": [["dire_mushroom", "dire_goblin", "dire_skeleton", "dire_zombie", "dire_rat"], ["dire_ghost", "dire_golem", "dire_plant", "dire_ent", "dire_orc"], ["dire_skeleton", "dire_orc", "dire_gnoll", "dire_imp", "dire_ghost"], ["dire_ent", "dire_imp", "dire_lich", "dire_gnoll", "dire_plant"], ["dire_imp", "dire_lich", "dire_lich", "dire_lich", "dire_gnoll"]]}, "savage": {"id": "savage", "name": "Savage Dungeon", "slayLevel": 50, "delveLevel": 50, "endless": false, "waves": [["savage_rat", "savage_mushroom", "savage_skeleton", "savage_goblin", "savage_zombie"], ["savage_gnoll", "savage_golem", "savage_plant", "savage_ent", "savage_orc"], ["savage_ghost", "savage_beholder", "savage_gorgon", "savage_lich", "savage_lizardman"], ["savage_skeleton", "savage_orc", "savage_beholder", "savage_lizardman", "savage_gnoll"], ["savage_gorgon", "savage_beholder", "savage_lich", "savage_lizardman", "savage_gorgon"], ["savage_lich", "savage_vampire", "savage_vampire", "savage_vampire", "savage_gorgon"]]}, "fell": {"id": "fell", "name": "Fell Dungeon", "slayLevel": 70, "delveLevel": 70, "endless": false, "waves": [["fell_lesser_demon", "fell_orc", "fell_ghost", "fell_imp", "fell_gnoll"], ["fell_lizardman", "fell_greater_demon", "fell_vampire", "fell_gorgon", "fell_beholder"], ["fell_gnoll", "fell_imp", "fell_lizardman", "fell_ghost", "fell_orc"], ["fell_imp", "fell_lizardman", "fell_greater_demon", "fell_beholder", "fell_ghost"], ["fell_greater_demon", "fell_beholder", "fell_vampire", "fell_gorgon", "fell_greater_demon"], ["fell_greater_demon", "fell_lesser_demon", "fell_vampire", "fell_gorgon", "fell_greater_demon"], ["fell_greater_demon", "fell_vampire", "fell_vampire", "fell_vampire", "fell_gorgon"]]}, "ancient": {"id": "ancient", "name": "Ancient Dungeon", "slayLevel": 90, "delveLevel": 90, "endless": false, "waves": [["ancient_lizardman", "ancient_demon", "ancient_vampire", "ancient_gorgon", "ancient_beholder"], ["ancient_lizardman", "ancient_demon", "ancient_lich", "ancient_gorgon", "ancient_beholder"], ["ancient_lizardman", "ancient_beholder", "ancient_demon", "ancient_beholder", "ancient_lizardman"], ["ancient_gorgon", "ancient_demon", "ancient_demon", "ancient_demon", "ancient_vampire"], ["ancient_lich", "ancient_gorgon", "ancient_vampire", "ancient_beholder", "ancient_lich"], ["ancient_gorgon", "ancient_vampire", "ancient_lich", "ancient_vampire", "ancient_gorgon"], ["ancient_vampire", "ancient_lich", "ancient_demon", "ancient_lich", "ancient_vampire"], ["ancient_vampire", "ancient_lich", "ancient_lich", "ancient_lich", "ancient_vampire"]]}, "chaos": {"id": "chaos", "name": "Chaos Dungeon", "slayLevel": 20, "delveLevel": 20, "endless": true, "waves": []}};
+const MOBS_DATA = {"feeble_acid_slime": {"name": "Feeble Acid Slime", "life": 10, "spirit": 1, "strike": 1, "heft": 1, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 1, "defend": 1, "vigor": 1, "attackStyle": "slash", "attackSpeed": 4.5, "stabAttack": 0, "slashAttack": 5, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 1, "slashDefense": 3, "crushDefense": 2, "magicDefense": 3, "rangeDefense": 1, "meleeStrength": 2, "rangeStrength": 0, "magicStrength": 0}, "feeble_rage_slime": {"name": "Feeble Rage Slime", "life": 14, "spirit": 2, "strike": 3, "heft": 2, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 1, "defend": 4, "vigor": 3, "attackStyle": "crush", "attackSpeed": 4.5, "stabAttack": 0, "slashAttack": 0, "crushAttack": 10, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 3, "slashDefense": 1, "crushDefense": 2, "magicDefense": 1, "rangeDefense": 3, "meleeStrength": 0, "rangeStrength": 0, "magicStrength": 0}, "feeble_spike_slime": {"name": "Feeble Spike Slime", "life": 15, "spirit": 4, "strike": 5, "heft": 4, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 2, "defend": 6, "vigor": 5, "attackStyle": "stab", "attackSpeed": 4.5, "stabAttack": 15, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 3, "slashDefense": 2, "crushDefense": 3, "magicDefense": 1, "rangeDefense": 1, "meleeStrength": 0, "rangeStrength": 0, "magicStrength": 0}, "feeble_flame_slime": {"name": "Feeble Flame Slime", "life": 14, "spirit": 3, "strike": 1, "heft": 1, "sight": 1, "draw": 1, "focus": 4, "surge": 2, "dodge": 2, "defend": 5, "vigor": 3, "attackStyle": "magic", "attackSpeed": 4.5, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 12, "rangeAttack": 0, "stabDefense": 2, "slashDefense": 1, "crushDefense": 3, "magicDefense": 3, "rangeDefense": 1, "meleeStrength": 0, "rangeStrength": 0, "magicStrength": 0}, "feeble_frost_slime": {"name": "Feeble Frost Slime", "life": 12, "spirit": 1, "strike": 1, "heft": 1, "sight": 1, "draw": 1, "focus": 2, "surge": 2, "dodge": 1, "defend": 2, "vigor": 1, "attackStyle": "magic", "attackSpeed": 4.5, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 8, "rangeAttack": 0, "stabDefense": 1, "slashDefense": 2, "crushDefense": 1, "magicDefense": 3, "rangeDefense": 3, "meleeStrength": 0, "rangeStrength": 0, "magicStrength": 0}, "feeble_boom_slime": {"name": "Feeble Boom Slime", "life": 17, "spirit": 5, "strike": 1, "heft": 1, "sight": 6, "draw": 4, "focus": 1, "surge": 1, "dodge": 2, "defend": 7, "vigor": 4, "attackStyle": "range", "attackSpeed": 4.5, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 18, "stabDefense": 2, "slashDefense": 1, "crushDefense": 3, "magicDefense": 3, "rangeDefense": 1, "meleeStrength": 0, "rangeStrength": 0, "magicStrength": 0}, "feeble_spark_slime": {"name": "Feeble Spark Slime", "life": 27, "spirit": 7, "strike": 8, "heft": 6, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 3, "defend": 10, "vigor": 8, "attackStyle": "stab", "attackSpeed": 4.5, "stabAttack": 25, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 3, "slashDefense": 2, "crushDefense": 1, "magicDefense": 1, "rangeDefense": 3, "meleeStrength": 0, "rangeStrength": 0, "magicStrength": 0}, "feeble_rat": {"name": "Feeble Rat", "life": 23, "spirit": 9, "strike": 8, "heft": 8, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 14, "defend": 9, "vigor": 16, "attackStyle": "stab", "attackSpeed": 2, "stabAttack": 5, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 1, "slashDefense": 7, "crushDefense": 18, "magicDefense": 17, "rangeDefense": 1, "meleeStrength": 5, "rangeStrength": 0, "magicStrength": 0}, "feeble_mushroom": {"name": "Feeble Mushroom", "life": 27, "spirit": 9, "strike": 1, "heft": 1, "sight": 7, "draw": 7, "focus": 1, "surge": 1, "dodge": 8, "defend": 8, "vigor": 5, "attackStyle": "range", "attackSpeed": 4, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 30, "stabDefense": 0, "slashDefense": 16, "crushDefense": 15, "magicDefense": 1, "rangeDefense": 6, "meleeStrength": 0, "rangeStrength": 30, "magicStrength": 0}, "feeble_ember_slime": {"name": "Feeble Ember Slime", "life": 14, "spirit": 5, "strike": 1, "heft": 1, "sight": 7, "draw": 6, "focus": 1, "surge": 1, "dodge": 3, "defend": 8, "vigor": 6, "attackStyle": "range", "attackSpeed": 4.5, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 22, "stabDefense": 3, "slashDefense": 1, "crushDefense": 2, "magicDefense": 1, "rangeDefense": 3, "meleeStrength": 0, "rangeStrength": 0, "magicStrength": 0}, "slime_boss": {"name": "Slime Monarch", "life": 135, "spirit": 7, "strike": 12, "heft": 9, "sight": 2, "draw": 2, "focus": 2, "surge": 2, "dodge": 5, "defend": 15, "vigor": 8, "attackStyle": "stab", "attackSpeed": 4.5, "stabAttack": 38, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 5, "slashDefense": 3, "crushDefense": 2, "magicDefense": 2, "rangeDefense": 5, "meleeStrength": 0, "rangeStrength": 0, "magicStrength": 0}, "feeble_zombie": {"name": "Feeble Zombie", "life": 26, "spirit": 9, "strike": 9, "heft": 9, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 9, "defend": 11, "vigor": 3, "attackStyle": "crush", "attackSpeed": 4, "stabAttack": 0, "slashAttack": 0, "crushAttack": 30, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 8, "slashDefense": 1, "crushDefense": 1, "magicDefense": 19, "rangeDefense": 18, "meleeStrength": 30, "rangeStrength": 0, "magicStrength": 0}, "feeble_golem": {"name": "Feeble Golem", "life": 64, "spirit": 22, "strike": 19, "heft": 19, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 17, "defend": 29, "vigor": 5, "attackStyle": "crush", "attackSpeed": 4.5, "stabAttack": 0, "slashAttack": 0, "crushAttack": 47, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 40, "slashDefense": 38, "crushDefense": 1, "magicDefense": 2, "rangeDefense": 17, "meleeStrength": 47, "rangeStrength": 0, "magicStrength": 0}, "feeble_plant": {"name": "Feeble Plant", "life": 60, "spirit": 35, "strike": 1, "heft": 1, "sight": 21, "draw": 21, "focus": 1, "surge": 1, "dodge": 21, "defend": 22, "vigor": 19, "attackStyle": "range", "attackSpeed": 3.5, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 26, "stabDefense": 3, "slashDefense": 1, "crushDefense": 43, "magicDefense": 41, "rangeDefense": 19, "meleeStrength": 0, "rangeStrength": 26, "magicStrength": 0}, "feeble_ent": {"name": "Feeble Treant", "life": 55, "spirit": 28, "strike": 20, "heft": 20, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 19, "defend": 29, "vigor": 5, "attackStyle": "crush", "attackSpeed": 4.5, "stabAttack": 0, "slashAttack": 0, "crushAttack": 47, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 39, "slashDefense": 42, "crushDefense": 18, "magicDefense": 1, "rangeDefense": 2, "meleeStrength": 47, "rangeStrength": 0, "magicStrength": 0}, "feeble_goblin": {"name": "Feeble Goblin", "life": 28, "spirit": 8, "strike": 11, "heft": 11, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 15, "defend": 11, "vigor": 15, "attackStyle": "slash", "attackSpeed": 2.5, "stabAttack": 0, "slashAttack": 5, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 1, "slashDefense": 8, "crushDefense": 1, "magicDefense": 21, "rangeDefense": 20, "meleeStrength": 5, "rangeStrength": 0, "magicStrength": 0}, "feeble_imp": {"name": "Feeble Imp", "life": 66, "spirit": 27, "strike": 1, "heft": 1, "sight": 1, "draw": 1, "focus": 23, "surge": 23, "dodge": 38, "defend": 23, "vigor": 44, "attackStyle": "magic", "attackSpeed": 2.5, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 5, "rangeAttack": 0, "stabDefense": 21, "slashDefense": 3, "crushDefense": 48, "magicDefense": 45, "rangeDefense": 1, "meleeStrength": 0, "rangeStrength": 0, "magicStrength": 5}, "feeble_skeleton": {"name": "Feeble Skeleton", "life": 59, "spirit": 29, "strike": 22, "heft": 22, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 26, "defend": 27, "vigor": 27, "attackStyle": "stab", "attackSpeed": 3, "stabAttack": 22, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 3, "slashDefense": 1, "crushDefense": 42, "magicDefense": 19, "rangeDefense": 45, "meleeStrength": 22, "rangeStrength": 0, "magicStrength": 0}, "dire_mushroom": {"name": "Dire Mushroom", "life": 82, "spirit": 34, "strike": 1, "heft": 1, "sight": 25, "draw": 25, "focus": 1, "surge": 1, "dodge": 27, "defend": 28, "vigor": 16, "attackStyle": "range", "attackSpeed": 4, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 54, "stabDefense": 2, "slashDefense": 53, "crushDefense": 49, "magicDefense": 3, "rangeDefense": 22, "meleeStrength": 0, "rangeStrength": 54, "magicStrength": 0}, "dire_goblin": {"name": "Dire Goblin", "life": 69, "spirit": 29, "strike": 27, "heft": 27, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 39, "defend": 27, "vigor": 40, "attackStyle": "slash", "attackSpeed": 2.5, "stabAttack": 0, "slashAttack": 12, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 2, "slashDefense": 23, "crushDefense": 3, "magicDefense": 56, "rangeDefense": 53, "meleeStrength": 12, "rangeStrength": 0, "magicStrength": 0}, "dire_skeleton": {"name": "Dire Skeleton", "life": 78, "spirit": 42, "strike": 30, "heft": 30, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 36, "defend": 38, "vigor": 38, "attackStyle": "stab", "attackSpeed": 3, "stabAttack": 37, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 4, "slashDefense": 2, "crushDefense": 59, "magicDefense": 26, "rangeDefense": 62, "meleeStrength": 37, "rangeStrength": 0, "magicStrength": 0}, "dire_zombie": {"name": "Dire Zombie", "life": 69, "spirit": 24, "strike": 27, "heft": 27, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 27, "defend": 30, "vigor": 11, "attackStyle": "crush", "attackSpeed": 4, "stabAttack": 0, "slashAttack": 0, "crushAttack": 54, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 23, "slashDefense": 2, "crushDefense": 3, "magicDefense": 56, "rangeDefense": 53, "meleeStrength": 54, "rangeStrength": 0, "magicStrength": 0}, "dire_rat": {"name": "Dire Rat", "life": 65, "spirit": 27, "strike": 26, "heft": 26, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 41, "defend": 27, "vigor": 49, "attackStyle": "stab", "attackSpeed": 2, "stabAttack": 3, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 3, "slashDefense": 23, "crushDefense": 54, "magicDefense": 50, "rangeDefense": 2, "meleeStrength": 3, "rangeStrength": 0, "magicStrength": 0}, "dire_ghost": {"name": "Dire Ghost", "life": 82, "spirit": 49, "strike": 1, "heft": 1, "sight": 1, "draw": 1, "focus": 32, "surge": 32, "dodge": 48, "defend": 29, "vigor": 27, "attackStyle": "magic", "attackSpeed": 3.8, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 45, "rangeAttack": 0, "stabDefense": 64, "slashDefense": 60, "crushDefense": 27, "magicDefense": 2, "rangeDefense": 4, "meleeStrength": 0, "rangeStrength": 0, "magicStrength": 45}, "dire_golem": {"name": "Dire Golem", "life": 95, "spirit": 42, "strike": 34, "heft": 34, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 29, "defend": 50, "vigor": 8, "attackStyle": "crush", "attackSpeed": 4.5, "stabAttack": 0, "slashAttack": 0, "crushAttack": 80, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 69, "slashDefense": 65, "crushDefense": 2, "magicDefense": 4, "rangeDefense": 29, "meleeStrength": 80, "rangeStrength": 0, "magicStrength": 0}, "dire_plant": {"name": "Dire Plant", "life": 82, "spirit": 53, "strike": 1, "heft": 1, "sight": 36, "draw": 36, "focus": 1, "surge": 1, "dodge": 36, "defend": 38, "vigor": 30, "attackStyle": "range", "attackSpeed": 3.5, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 45, "stabDefense": 4, "slashDefense": 2, "crushDefense": 72, "magicDefense": 68, "rangeDefense": 30, "meleeStrength": 0, "rangeStrength": 45, "magicStrength": 0}, "dire_ent": {"name": "Dire Treant", "life": 78, "spirit": 47, "strike": 35, "heft": 35, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 33, "defend": 49, "vigor": 8, "attackStyle": "crush", "attackSpeed": 4.5, "stabAttack": 0, "slashAttack": 0, "crushAttack": 80, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 67, "slashDefense": 71, "crushDefense": 30, "magicDefense": 2, "rangeDefense": 4, "meleeStrength": 80, "rangeStrength": 0, "magicStrength": 0}, "dire_orc": {"name": "Dire Orc", "life": 86, "spirit": 37, "strike": 33, "heft": 33, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 35, "defend": 43, "vigor": 28, "attackStyle": "slash", "attackSpeed": 3.5, "stabAttack": 0, "slashAttack": 45, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 28, "slashDefense": 67, "crushDefense": 63, "magicDefense": 4, "rangeDefense": 2, "meleeStrength": 45, "rangeStrength": 0, "magicStrength": 0}, "dire_gnoll": {"name": "Dire Gnoll", "life": 90, "spirit": 49, "strike": 39, "heft": 39, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 54, "defend": 46, "vigor": 58, "attackStyle": "slash", "attackSpeed": 2.8, "stabAttack": 0, "slashAttack": 33, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 75, "slashDefense": 34, "crushDefense": 2, "magicDefense": 5, "rangeDefense": 80, "meleeStrength": 33, "rangeStrength": 0, "magicStrength": 0}, "dire_imp": {"name": "Dire Imp", "life": 82, "spirit": 50, "strike": 1, "heft": 1, "sight": 1, "draw": 1, "focus": 37, "surge": 37, "dodge": 60, "defend": 37, "vigor": 69, "attackStyle": "magic", "attackSpeed": 2.5, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 9, "rangeAttack": 0, "stabDefense": 33, "slashDefense": 4, "crushDefense": 77, "magicDefense": 71, "rangeDefense": 2, "meleeStrength": 0, "rangeStrength": 0, "magicStrength": 9}, "dire_lich": {"name": "Dire Lich", "life": 95, "spirit": 64, "strike": 1, "heft": 1, "sight": 1, "draw": 1, "focus": 40, "surge": 40, "dodge": 43, "defend": 56, "vigor": 36, "attackStyle": "magic", "attackSpeed": 4, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 62, "rangeAttack": 0, "stabDefense": 2, "slashDefense": 36, "crushDefense": 5, "magicDefense": 83, "rangeDefense": 78, "meleeStrength": 0, "rangeStrength": 0, "magicStrength": 62}, "savage_rat": {"name": "Savage Rat", "life": 109, "spirit": 45, "strike": 42, "heft": 42, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 66, "defend": 45, "vigor": 79, "attackStyle": "stab", "attackSpeed": 2, "stabAttack": 5, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 5, "slashDefense": 37, "crushDefense": 87, "magicDefense": 82, "rangeDefense": 3, "meleeStrength": 5, "rangeStrength": 0, "magicStrength": 0}, "savage_mushroom": {"name": "Savage Mushroom", "life": 137, "spirit": 67, "strike": 1, "heft": 1, "sight": 44, "draw": 44, "focus": 1, "surge": 1, "dodge": 46, "defend": 49, "vigor": 27, "attackStyle": "range", "attackSpeed": 4, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 64, "stabDefense": 3, "slashDefense": 90, "crushDefense": 85, "magicDefense": 5, "rangeDefense": 38, "meleeStrength": 0, "rangeStrength": 64, "magicStrength": 0}, "savage_skeleton": {"name": "Savage Skeleton", "life": 130, "spirit": 56, "strike": 46, "heft": 46, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 55, "defend": 58, "vigor": 58, "attackStyle": "stab", "attackSpeed": 3, "stabAttack": 45, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 6, "slashDefense": 3, "crushDefense": 89, "magicDefense": 41, "rangeDefense": 96, "meleeStrength": 45, "rangeStrength": 0, "magicStrength": 0}, "savage_goblin": {"name": "Savage Goblin", "life": 117, "spirit": 39, "strike": 44, "heft": 44, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 64, "defend": 44, "vigor": 67, "attackStyle": "slash", "attackSpeed": 2.5, "stabAttack": 0, "slashAttack": 16, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 3, "slashDefense": 39, "crushDefense": 5, "magicDefense": 91, "rangeDefense": 86, "meleeStrength": 16, "rangeStrength": 0, "magicStrength": 0}, "savage_zombie": {"name": "Savage Zombie", "life": 117, "spirit": 42, "strike": 43, "heft": 43, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 43, "defend": 48, "vigor": 16, "attackStyle": "crush", "attackSpeed": 4, "stabAttack": 0, "slashAttack": 0, "crushAttack": 66, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 38, "slashDefense": 3, "crushDefense": 5, "magicDefense": 88, "rangeDefense": 83, "meleeStrength": 66, "rangeStrength": 0, "magicStrength": 0}, "savage_gnoll": {"name": "Savage Gnoll", "life": 150, "spirit": 61, "strike": 47, "heft": 47, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 65, "defend": 56, "vigor": 70, "attackStyle": "slash", "attackSpeed": 2.8, "stabAttack": 0, "slashAttack": 42, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 91, "slashDefense": 41, "crushDefense": 3, "magicDefense": 6, "rangeDefense": 97, "meleeStrength": 42, "rangeStrength": 0, "magicStrength": 0}, "savage_golem": {"name": "Savage Golem", "life": 158, "spirit": 62, "strike": 48, "heft": 48, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 43, "defend": 74, "vigor": 13, "attackStyle": "crush", "attackSpeed": 4.5, "stabAttack": 0, "slashAttack": 0, "crushAttack": 99, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 101, "slashDefense": 95, "crushDefense": 3, "magicDefense": 6, "rangeDefense": 43, "meleeStrength": 99, "rangeStrength": 0, "magicStrength": 0}, "savage_plant": {"name": "Savage Plant", "life": 137, "spirit": 76, "strike": 1, "heft": 1, "sight": 50, "draw": 50, "focus": 1, "surge": 1, "dodge": 50, "defend": 54, "vigor": 44, "attackStyle": "range", "attackSpeed": 3.5, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 56, "stabDefense": 6, "slashDefense": 3, "crushDefense": 104, "magicDefense": 98, "rangeDefense": 44, "meleeStrength": 0, "rangeStrength": 56, "magicStrength": 0}, "savage_ent": {"name": "Savage Treant", "life": 130, "spirit": 64, "strike": 49, "heft": 49, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 46, "defend": 71, "vigor": 13, "attackStyle": "crush", "attackSpeed": 4.5, "stabAttack": 0, "slashAttack": 0, "crushAttack": 99, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 96, "slashDefense": 102, "crushDefense": 43, "magicDefense": 3, "rangeDefense": 6, "meleeStrength": 99, "rangeStrength": 0, "magicStrength": 0}, "savage_orc": {"name": "Savage Orc", "life": 144, "spirit": 56, "strike": 48, "heft": 48, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 50, "defend": 63, "vigor": 42, "attackStyle": "slash", "attackSpeed": 3.5, "stabAttack": 0, "slashAttack": 56, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 42, "slashDefense": 99, "crushDefense": 92, "magicDefense": 6, "rangeDefense": 3, "meleeStrength": 56, "rangeStrength": 0, "magicStrength": 0}, "savage_ghost": {"name": "Savage Ghost", "life": 137, "spirit": 68, "strike": 1, "heft": 1, "sight": 1, "draw": 1, "focus": 53, "surge": 53, "dodge": 82, "defend": 49, "vigor": 45, "attackStyle": "magic", "attackSpeed": 3.8, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 56, "rangeAttack": 0, "stabDefense": 107, "slashDefense": 101, "crushDefense": 45, "magicDefense": 3, "rangeDefense": 6, "meleeStrength": 0, "rangeStrength": 0, "magicStrength": 56}, "savage_beholder": {"name": "Savage Orbiter", "life": 150, "spirit": 75, "strike": 1, "heft": 1, "sight": 55, "draw": 55, "focus": 1, "surge": 1, "dodge": 62, "defend": 76, "vigor": 68, "attackStyle": "range", "attackSpeed": 3.5, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 69, "stabDefense": 48, "slashDefense": 7, "crushDefense": 3, "magicDefense": 112, "rangeDefense": 106, "meleeStrength": 0, "rangeStrength": 69, "magicStrength": 0}, "savage_gorgon": {"name": "Savage Gorgon", "life": 150, "spirit": 83, "strike": 1, "heft": 1, "sight": 1, "draw": 1, "focus": 57, "surge": 57, "dodge": 74, "defend": 70, "vigor": 63, "attackStyle": "magic", "attackSpeed": 3.8, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 68, "rangeAttack": 0, "stabDefense": 3, "slashDefense": 49, "crushDefense": 117, "magicDefense": 7, "rangeDefense": 109, "meleeStrength": 0, "rangeStrength": 0, "magicStrength": 68}, "savage_lich": {"name": "Savage Lich", "life": 158, "spirit": 77, "strike": 1, "heft": 1, "sight": 1, "draw": 1, "focus": 56, "surge": 56, "dodge": 59, "defend": 77, "vigor": 48, "attackStyle": "magic", "attackSpeed": 4, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 72, "rangeAttack": 0, "stabDefense": 3, "slashDefense": 48, "crushDefense": 7, "magicDefense": 114, "rangeDefense": 107, "meleeStrength": 0, "rangeStrength": 0, "magicStrength": 72}, "savage_lizardman": {"name": "Savage Lizardman", "life": 137, "spirit": 70, "strike": 53, "heft": 53, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 69, "defend": 69, "vigor": 66, "attackStyle": "stab", "attackSpeed": 3.2, "stabAttack": 49, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 109, "slashDefense": 6, "crushDefense": 46, "magicDefense": 103, "rangeDefense": 3, "meleeStrength": 49, "rangeStrength": 0, "magicStrength": 0}, "savage_vampire": {"name": "Savage Vampire", "life": 144, "spirit": 72, "strike": 58, "heft": 58, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 87, "defend": 72, "vigor": 95, "attackStyle": "slash", "attackSpeed": 3, "stabAttack": 0, "slashAttack": 58, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 120, "slashDefense": 50, "crushDefense": 3, "magicDefense": 112, "rangeDefense": 7, "meleeStrength": 58, "rangeStrength": 0, "magicStrength": 0}, "fell_lesser_demon": {"name": "Fell Lesser Demon", "life": 229, "spirit": 76, "strike": 59, "heft": 59, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 74, "defend": 78, "vigor": 59, "attackStyle": "crush", "attackSpeed": 3.5, "stabAttack": 0, "slashAttack": 0, "crushAttack": 91, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 7, "slashDefense": 51, "crushDefense": 122, "magicDefense": 4, "rangeDefense": 114, "meleeStrength": 91, "rangeStrength": 0, "magicStrength": 0}, "fell_orc": {"name": "Fell Orc", "life": 229, "spirit": 75, "strike": 62, "heft": 62, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 66, "defend": 82, "vigor": 55, "attackStyle": "slash", "attackSpeed": 3.5, "stabAttack": 0, "slashAttack": 66, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 55, "slashDefense": 128, "crushDefense": 121, "magicDefense": 7, "rangeDefense": 4, "meleeStrength": 66, "rangeStrength": 0, "magicStrength": 0}, "fell_ghost": {"name": "Fell Ghost", "life": 218, "spirit": 100, "strike": 1, "heft": 1, "sight": 1, "draw": 1, "focus": 65, "surge": 65, "dodge": 103, "defend": 62, "vigor": 58, "attackStyle": "magic", "attackSpeed": 3.8, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 65, "rangeAttack": 0, "stabDefense": 135, "slashDefense": 127, "crushDefense": 58, "magicDefense": 4, "rangeDefense": 8, "meleeStrength": 0, "rangeStrength": 0, "magicStrength": 65}, "fell_imp": {"name": "Fell Imp", "life": 218, "spirit": 68, "strike": 1, "heft": 1, "sight": 1, "draw": 1, "focus": 64, "surge": 64, "dodge": 104, "defend": 64, "vigor": 120, "attackStyle": "magic", "attackSpeed": 2.5, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 12, "rangeAttack": 0, "stabDefense": 56, "slashDefense": 8, "crushDefense": 131, "magicDefense": 124, "rangeDefense": 4, "meleeStrength": 0, "rangeStrength": 0, "magicStrength": 12}, "fell_gnoll": {"name": "Fell Gnoll", "life": 240, "spirit": 75, "strike": 61, "heft": 61, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 83, "defend": 71, "vigor": 90, "attackStyle": "slash", "attackSpeed": 2.8, "stabAttack": 0, "slashAttack": 49, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 118, "slashDefense": 53, "crushDefense": 4, "magicDefense": 7, "rangeDefense": 125, "meleeStrength": 49, "rangeStrength": 0, "magicStrength": 0}, "fell_lizardman": {"name": "Fell Lizardman", "life": 218, "spirit": 90, "strike": 67, "heft": 67, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 88, "defend": 88, "vigor": 84, "attackStyle": "stab", "attackSpeed": 3.2, "stabAttack": 58, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 139, "slashDefense": 8, "crushDefense": 59, "magicDefense": 130, "rangeDefense": 4, "meleeStrength": 58, "rangeStrength": 0, "magicStrength": 0}, "fell_greater_demon": {"name": "Fell Greater Demon", "life": 229, "spirit": 81, "strike": 71, "heft": 71, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 81, "defend": 103, "vigor": 62, "attackStyle": "slash", "attackSpeed": 3.8, "stabAttack": 0, "slashAttack": 99, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 139, "slashDefense": 147, "crushDefense": 62, "magicDefense": 4, "rangeDefense": 9, "meleeStrength": 99, "rangeStrength": 0, "magicStrength": 0}, "fell_vampire": {"name": "Fell Vampire", "life": 229, "spirit": 87, "strike": 75, "heft": 75, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 112, "defend": 93, "vigor": 122, "attackStyle": "slash", "attackSpeed": 3, "stabAttack": 0, "slashAttack": 70, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 154, "slashDefense": 65, "crushDefense": 4, "magicDefense": 145, "rangeDefense": 9, "meleeStrength": 70, "rangeStrength": 0, "magicStrength": 0}, "fell_gorgon": {"name": "Fell Gorgon", "life": 240, "spirit": 112, "strike": 1, "heft": 1, "sight": 1, "draw": 1, "focus": 74, "surge": 74, "dodge": 96, "defend": 91, "vigor": 82, "attackStyle": "magic", "attackSpeed": 3.8, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 81, "rangeAttack": 0, "stabDefense": 4, "slashDefense": 64, "crushDefense": 151, "magicDefense": 9, "rangeDefense": 142, "meleeStrength": 0, "rangeStrength": 0, "magicStrength": 81}, "fell_beholder": {"name": "Fell Orbiter", "life": 240, "spirit": 103, "strike": 1, "heft": 1, "sight": 69, "draw": 69, "focus": 1, "surge": 1, "dodge": 78, "defend": 95, "vigor": 86, "attackStyle": "range", "attackSpeed": 3.5, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 83, "stabDefense": 60, "slashDefense": 8, "crushDefense": 4, "magicDefense": 142, "rangeDefense": 133, "meleeStrength": 0, "rangeStrength": 83, "magicStrength": 0}, "ancient_lizardman": {"name": "Ancient Lizardman", "life": 311, "spirit": 96, "strike": 76, "heft": 76, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 100, "defend": 100, "vigor": 95, "attackStyle": "stab", "attackSpeed": 3.2, "stabAttack": 75, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 156, "slashDefense": 9, "crushDefense": 66, "magicDefense": 147, "rangeDefense": 5, "meleeStrength": 75, "rangeStrength": 0, "magicStrength": 0}, "ancient_demon": {"name": "Ancient Demon", "life": 295, "spirit": 97, "strike": 79, "heft": 79, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 99, "defend": 108, "vigor": 79, "attackStyle": "crush", "attackSpeed": 3.8, "stabAttack": 0, "slashAttack": 0, "crushAttack": 125, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 9, "slashDefense": 163, "crushDefense": 69, "magicDefense": 5, "rangeDefense": 153, "meleeStrength": 125, "rangeStrength": 0, "magicStrength": 0}, "ancient_vampire": {"name": "Ancient Vampire", "life": 327, "spirit": 110, "strike": 82, "heft": 82, "sight": 1, "draw": 1, "focus": 1, "surge": 1, "dodge": 124, "defend": 103, "vigor": 133, "attackStyle": "slash", "attackSpeed": 3, "stabAttack": 0, "slashAttack": 87, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 0, "stabDefense": 170, "slashDefense": 72, "crushDefense": 5, "magicDefense": 160, "rangeDefense": 11, "meleeStrength": 87, "rangeStrength": 0, "magicStrength": 0}, "ancient_gorgon": {"name": "Ancient Gorgon", "life": 341, "spirit": 139, "strike": 1, "heft": 1, "sight": 1, "draw": 1, "focus": 81, "surge": 81, "dodge": 106, "defend": 101, "vigor": 90, "attackStyle": "magic", "attackSpeed": 3.8, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 97, "rangeAttack": 0, "stabDefense": 5, "slashDefense": 70, "crushDefense": 166, "magicDefense": 11, "rangeDefense": 156, "meleeStrength": 0, "rangeStrength": 0, "magicStrength": 97}, "ancient_beholder": {"name": "Ancient Orbiter", "life": 341, "spirit": 121, "strike": 1, "heft": 1, "sight": 78, "draw": 78, "focus": 1, "surge": 1, "dodge": 87, "defend": 106, "vigor": 97, "attackStyle": "range", "attackSpeed": 3.5, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 0, "rangeAttack": 102, "stabDefense": 67, "slashDefense": 9, "crushDefense": 5, "magicDefense": 160, "rangeDefense": 150, "meleeStrength": 0, "rangeStrength": 102, "magicStrength": 0}, "ancient_lich": {"name": "Ancient Lich", "life": 357, "spirit": 118, "strike": 1, "heft": 1, "sight": 1, "draw": 1, "focus": 83, "surge": 83, "dodge": 88, "defend": 114, "vigor": 72, "attackStyle": "magic", "attackSpeed": 4, "stabAttack": 0, "slashAttack": 0, "crushAttack": 0, "magicAttack": 103, "rangeAttack": 0, "stabDefense": 5, "slashDefense": 72, "crushDefense": 11, "magicDefense": 171, "rangeDefense": 161, "meleeStrength": 0, "rangeStrength": 0, "magicStrength": 103}};
+
+// Combat constants from Constants.js
+const CM_CONSTS = {
+  SKILL_MULT: 2,
+  MAX_HIT_BASE: 2,
+  MAX_HIT_DIVISOR: 5,
+  HIT_BASELINE: 0.6,
+  HIT_SLOPE: 0.003,
+  HIT_FLOOR: 0.1,
+  HIT_CEILING: 1.0,
+  REDUCTION_CAP: 0.75,
+  REDUCTION_DIVISOR: 10,
+  SPIRIT_BASE_MODIFIER: 1.1,
+  VIGOR_SLOPE: 0.0025,
+  VIGOR_REDUCTION_CAP: 0.5,
+  CRIT_BASE_CHANCE_PCT: 5,
+  CRIT_BASE_DAMAGE_MULT_PCT: 120,
+  RAID_WAVE_RESPAWN_BASE: 10,
+  RAID_WAVE_RESPAWN_MIN: 3,
+  RAID_CLONE_RESPAWN_PENALTY: 1,
+  FOOD_AUTO_EAT_COOLDOWN_SEC: 5.0
+};
+
+// Canonical CombatMath resolution
+function buildScore(level, equipBonus, bonuses, spirit, cpBonus) {
+  const eff = (level || 1) + (bonuses || 0);
+  const spiritMod = spirit ? (CM_CONSTS.SPIRIT_BASE_MODIFIER + (cpBonus || 0)) : 1.0;
+  return Math.floor(CM_CONSTS.SKILL_MULT * eff * spiritMod) + (equipBonus || 0);
+}
+
+function maxHit(sAtk) {
+  return CM_CONSTS.MAX_HIT_BASE + Math.floor(sAtk / CM_CONSTS.MAX_HIT_DIVISOR);
+}
+
+function damageReduction(sDef) {
+  return Math.min(CM_CONSTS.REDUCTION_CAP, Math.floor(sDef / CM_CONSTS.REDUCTION_DIVISOR) / 100);
+}
+
+function finalDamage(rawDmg, reduction) {
+  return Math.max(1, Math.ceil(rawDmg * (1 - reduction)));
+}
+
+function hitChanceFromScores(A, D) {
+  const raw = CM_CONSTS.HIT_BASELINE + CM_CONSTS.HIT_SLOPE * (A - D);
+  const chance = Math.max(CM_CONSTS.HIT_FLOOR, Math.min(CM_CONSTS.HIT_CEILING, raw));
+  const overflow = Math.max(0, raw - CM_CONSTS.HIT_CEILING);
+  return { raw, chance, overflow };
+}
+
+function minHitFloor(overflow, maxH) {
+  if (overflow <= 0) return 1;
+  return Math.min(maxH, 1 + Math.floor(overflow * maxH));
+}
+
+function attackInterval(weaponSpeed, vigorScore) {
+  const speed = (weaponSpeed && weaponSpeed > 0) ? weaponSpeed : 4.0;
+  const vRed = Math.min(CM_CONSTS.VIGOR_REDUCTION_CAP, ((vigorScore || 0) + 1) * CM_CONSTS.VIGOR_SLOPE);
+  return Math.max(1.5, speed * (1 - vRed));
+}
+
+// Active dungeon state
+let currentDungeonDiff = 'feeble';
+let currentPartySize = 5;
+let currentBestComp = null;
+
+// Tab switcher
+function switchMainTab(tab) {
+  const tabFortress = document.getElementById('tabModeFortress');
+  const tabDungeon = document.getElementById('tabModeDungeon');
+  const viewFortress = document.getElementById('view-fortress');
+  const viewDungeon = document.getElementById('view-dungeon');
+
+  if (tab === 'fortress') {
+    tabFortress.classList.add('active');
+    tabDungeon.classList.remove('active');
+    viewFortress.style.display = 'block';
+    viewDungeon.style.display = 'none';
+  } else {
+    tabDungeon.classList.add('active');
+    tabFortress.classList.remove('active');
+    viewFortress.style.display = 'none';
+    viewDungeon.style.display = 'block';
+    updateDungeonUI();
+  }
+}
+
+function setDungeonDifficulty(diff) {
+  currentDungeonDiff = diff;
+  document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector('.diff-btn.' + diff);
+  if (btn) btn.classList.add('active');
+
+  const chaosGroup = document.getElementById('groupChaosReset');
+  if (chaosGroup) chaosGroup.style.display = (diff === 'chaos') ? 'block' : 'none';
+
+  updateDungeonUI();
+}
+
+function onDungeonPartySizeChanged() {
+  currentPartySize = parseInt(document.getElementById('selDungeonPartySize').value) || 5;
+  updateRespawnDelayTracker();
+  renderManualPartySlots();
+}
+
+function updateRespawnDelayTracker() {
+  const hostReduction = (currentAudit && currentAudit.respawnReduction) || 0;
+  const cloneCount = Math.max(0, currentPartySize - 1);
+  const clonesPenalty = cloneCount * CM_CONSTS.RAID_CLONE_RESPAWN_PENALTY;
+  const netDelay = Math.max(CM_CONSTS.RAID_WAVE_RESPAWN_MIN, CM_CONSTS.RAID_WAVE_RESPAWN_BASE - hostReduction + clonesPenalty);
+
+  document.getElementById('lblHostRespawnReduction').textContent = '-' + hostReduction.toFixed(1) + 's';
+  document.getElementById('lblClonesRespawnPenalty').textContent = '+' + clonesPenalty.toFixed(1) + 's (' + cloneCount + ' clones)';
+  document.getElementById('lblNetRespawnDelay').textContent = netDelay.toFixed(1) + 's / wave';
+}
+
+function getDungeonWaves(diff) {
+  const d = DUNGEON_DATA[diff];
+  if (!d) return [];
+  if (diff === 'chaos') {
+    // Procedural chaos waves up to target reset or 20 waves default
+    const reset = parseInt(document.getElementById('selChaosReset') ? document.getElementById('selChaosReset').value : 0) || 20;
+    const count = (reset > 0) ? reset : 20;
+    const waves = [];
+    const pool = Object.keys(MOBS_DATA);
+    for (let w = 1; w <= count; w++) {
+      const wave = [];
+      for (let m = 0; m < 5; m++) {
+        wave.push(pool[(w * 3 + m) % pool.length]);
+      }
+      waves.push(wave);
+    }
+    return waves;
+  }
+  return d.waves || [];
+}
+
+function updateDungeonUI() {
+  const d = DUNGEON_DATA[currentDungeonDiff];
+  const waves = getDungeonWaves(currentDungeonDiff);
+  document.getElementById('lblDungeonTierMeta').textContent = (d ? d.name : currentDungeonDiff) + ' (' + waves.length + ' waves)';
+  document.getElementById('lblBestDiffName').textContent = d ? d.name : currentDungeonDiff;
+  updateRespawnDelayTracker();
+  renderEnemyIntelTable();
+  renderManualPartySlots();
+}
+
+function renderEnemyIntelTable() {
+  const tbody = document.getElementById('tblEnemyIntelBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const waves = getDungeonWaves(currentDungeonDiff);
+  const mobSet = new Set();
+  waves.forEach(w => w.forEach(m => mobSet.add(m)));
+
+  mobSet.forEach(mId => {
+    const m = MOBS_DATA[mId];
+    if (!m) return;
+    const defs = [
+      { style: 'Stab', val: m.stabDefense },
+      { style: 'Slash', val: m.slashDefense },
+      { style: 'Crush', val: m.crushDefense },
+      { style: 'Range', val: m.rangeDefense },
+      { style: 'Magic', val: m.magicDefense }
+    ];
+    defs.sort((a, b) => a.val - b.val);
+    const lowest = defs[0];
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>${m.name}</strong></td>
+      <td><span style="color:#ef4444;font-weight:700;">${m.life} HP</span></td>
+      <td><span class="style-pill ${m.attackStyle}">${m.attackStyle}</span></td>
+      <td>${m.attackSpeed.toFixed(1)}s</td>
+      <td>${m.stabDefense}</td>
+      <td>${m.slashDefense}</td>
+      <td>${m.crushDefense}</td>
+      <td>${m.rangeDefense}</td>
+      <td>${m.magicDefense}</td>
+      <td><span class="enemy-weakness-badge">${lowest.style} (${lowest.val} def)</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function getAvailablePlayerLoadouts() {
+  if (currentAudit && currentAudit.combatLoadouts && Object.keys(currentAudit.combatLoadouts).length > 0) {
+    return Object.values(currentAudit.combatLoadouts);
+  }
+  // Default presets
+  return [
+    { id: 'magic_1', name: 'Magic (Staff/Wand)', style: 'magic', stats: { magicAttack: 35, magicStrength: 35, attackSpeed: 3.5, stabDefense: 20, slashDefense: 20, crushDefense: 20, magicDefense: 45, rangeDefense: 30 } },
+    { id: 'range_1', name: 'Ranged (Bow)', style: 'range', stats: { rangeAttack: 35, rangeStrength: 35, attackSpeed: 3.2, stabDefense: 20, slashDefense: 20, crushDefense: 20, rangeDefense: 45, magicDefense: 30 } },
+    { id: 'melee_slash', name: 'Melee (Slash)', style: 'slash', stats: { slashAttack: 35, meleeStrength: 35, attackSpeed: 3.0, stabDefense: 35, slashDefense: 45, crushDefense: 35, rangeDefense: 25, magicDefense: 15 } },
+    { id: 'melee_crush', name: 'Melee (Crush)', style: 'crush', stats: { crushAttack: 35, meleeStrength: 35, attackSpeed: 3.8, stabDefense: 35, slashDefense: 35, crushDefense: 50, rangeDefense: 25, magicDefense: 15 } }
+  ];
+}
+
+function renderManualPartySlots() {
+  const grid = document.getElementById('gridManualPartySlots');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  const loadouts = getAvailablePlayerLoadouts();
+
+  for (let i = 0; i < currentPartySize; i++) {
+    const isHost = (i === 0);
+    const box = document.createElement('div');
+    box.className = 'loadout-slot-box' + (isHost ? ' host' : '');
+
+    let optionsHtml = '';
+    loadouts.forEach(ld => {
+      optionsHtml += `<option value="${ld.id}">${ld.name} (${ld.style})</option>`;
+    });
+
+    box.innerHTML = `
+      <div class="role-label">
+        <span>${isHost ? '👑 Host (You)' : '👥 Clone ' + i}</span>
+        ${isHost ? '<span style="color:var(--primary);">PRIMARY</span>' : ''}
+      </div>
+      <select class="party-slot-sel" id="selPartySlot_${i}" style="width:100%;margin-top:6px;background:#090d16;color:#fff;border:1px solid #1e293b;padding:8px;border-radius:6px;font-size:12px;">
+        ${optionsHtml}
+      </select>
+    `;
+    grid.appendChild(box);
+  }
+}
+
+// --- COMBAT SIMULATION CORE WITH RANDOM TARGETING ---
+function runSimOnce(partyLoadouts, waves, foodHeal, autoEatThreshold, hostReduction) {
+  const cloneCount = Math.max(0, partyLoadouts.length - 1);
+  const clonesPenalty = cloneCount * CM_CONSTS.RAID_CLONE_RESPAWN_PENALTY;
+  const waveRespawnDelay = Math.max(CM_CONSTS.RAID_WAVE_RESPAWN_MIN, CM_CONSTS.RAID_WAVE_RESPAWN_BASE - hostReduction + clonesPenalty);
+
+  const skills = (currentAudit && currentAudit.combatSkills) || {
+    strike: 30, heft: 30, sight: 30, draw: 30, focus: 30, surge: 30, dodge: 30, defend: 30, vigor: 25, life: 35, spirit: 30
+  };
+  const maxHp = (skills.life || 30) * 2;
+
+  // Party members state
+  const party = partyLoadouts.map((ld, idx) => {
+    const s = ld.stats || {};
+    const style = ld.style || 'slash';
+    const wepSpeed = s.attackSpeed || 3.5;
+    const interval = attackInterval(wepSpeed, skills.vigor || 20);
+    return {
+      idx,
+      name: idx === 0 ? 'Host' : 'Clone ' + idx,
+      loadout: ld,
+      style: style,
+      hp: maxHp,
+      maxHp: maxHp,
+      interval: interval,
+      timer: Math.random() * interval,
+      eatCooldown: 0
+    };
+  });
+
+  let totalCombatTime = 0;
+  let totalRespawnTime = 0;
+  let totalFoodEaten = 0;
+  let totalDamageDealt = 0;
+  let totalDamageTaken = 0;
+  let wavesCleared = 0;
+  const waveTimes = [];
+  const waveFood = [];
+
+  for (let wIdx = 0; wIdx < waves.length; wIdx++) {
+    const waveMobIds = waves[wIdx];
+    const mobs = waveMobIds.map((mId, mIdx) => {
+      const raw = MOBS_DATA[mId] || { name: 'Mob', life: 50, attackSpeed: 4.0, attackStyle: 'slash', defend: 20, dodge: 20 };
+      return {
+        idx: mIdx,
+        id: mId,
+        name: raw.name,
+        raw: raw,
+        hp: raw.life,
+        maxHp: raw.life,
+        speed: raw.attackSpeed || 4.0,
+        timer: Math.random() * (raw.attackSpeed || 4.0)
+      };
+    });
+
+    let waveTime = 0;
+    let waveFoodCount = 0;
+    const dt = 0.1;
+    let waveWon = false;
+
+    while (waveTime < 180) {
+      const aliveParty = party.filter(p => p.hp > 0);
+      const aliveMobs = mobs.filter(m => m.hp > 0);
+
+      if (aliveMobs.length === 0) {
+        waveWon = true;
+        break;
+      }
+      if (aliveParty.length === 0) {
+        waveWon = false;
+        break;
+      }
+
+      // --- PARTY ATTACKS RANDOM ALIVE MOB ---
+      aliveParty.forEach(p => {
+        p.timer -= dt;
+        if (p.eatCooldown > 0) p.eatCooldown -= dt;
+
+        if (p.timer <= 0) {
+          p.timer = p.interval;
+          // Random targeting among surviving enemies
+          const target = aliveMobs[Math.floor(Math.random() * aliveMobs.length)];
+          const tRaw = target.raw;
+
+          // Attack score
+          const isMagic = (p.style === 'magic');
+          const isRange = (p.style === 'range');
+          const accLvl = isMagic ? skills.focus : (isRange ? skills.sight : skills.strike);
+          const strLvl = isMagic ? skills.surge : (isRange ? skills.draw : skills.heft);
+          const accGear = isMagic ? (p.loadout.stats.magicAttack || 30) : (isRange ? (p.loadout.stats.rangeAttack || 30) : (p.loadout.stats[p.style + 'Attack'] || 30));
+          const strGear = isMagic ? (p.loadout.stats.magicStrength || 30) : (isRange ? (p.loadout.stats.rangeStrength || 30) : (p.loadout.stats.meleeStrength || 30));
+
+          const defGear = isMagic ? (tRaw.magicDefense || 0) : (isRange ? (tRaw.rangeDefense || 0) : (tRaw[p.style + 'Defense'] || 0));
+
+          const A = buildScore(accLvl, accGear, 0, true, 0);
+          const sAtk = buildScore(strLvl, strGear, 0, true, 0);
+          const D = buildScore(tRaw.dodge || 10, defGear, 0, false, 0);
+          const sDef = buildScore(tRaw.defend || 10, defGear, 0, false, 0);
+
+          const hc = hitChanceFromScores(A, D);
+          if (Math.random() < hc.chance) {
+            const maxH = maxHit(sAtk);
+            const red = damageReduction(sDef);
+            const minH = minHitFloor(hc.overflow, maxH);
+            const rawDmg = minH + Math.floor(Math.random() * (maxH - minH + 1));
+            let dmg = finalDamage(rawDmg, red);
+
+            // Crit check
+            if (Math.random() < (CM_CONSTS.CRIT_BASE_CHANCE_PCT / 100)) {
+              dmg = Math.floor(dmg * (CM_CONSTS.CRIT_BASE_DAMAGE_MULT_PCT / 100));
+            }
+
+            target.hp -= dmg;
+            totalDamageDealt += dmg;
+          }
+        }
+
+        // Auto-eat for party members below threshold
+        if (p.hp > 0 && p.hp <= p.maxHp * (autoEatThreshold / 100)) {
+          if (p.eatCooldown <= 0) {
+            p.hp = Math.min(p.maxHp, p.hp + foodHeal);
+            p.eatCooldown = CM_CONSTS.FOOD_AUTO_EAT_COOLDOWN_SEC;
+            waveFoodCount++;
+            totalFoodEaten++;
+          }
+        }
+      });
+
+      // --- MOBS ATTACK RANDOM ALIVE PARTY MEMBER ---
+      aliveMobs.forEach(m => {
+        m.timer -= dt;
+        if (m.timer <= 0) {
+          m.timer = m.speed;
+          // Random targeting among surviving party members
+          const target = aliveParty[Math.floor(Math.random() * aliveParty.length)];
+          const mRaw = m.raw;
+          const mStyle = mRaw.attackStyle || 'slash';
+
+          const tDefGear = target.loadout.stats[mStyle + 'Defense'] || 20;
+          const mA = buildScore(mRaw.strike || 20, mRaw[mStyle + 'Attack'] || 20, 0, false, 0);
+          const msAtk = buildScore(mRaw.heft || 20, mRaw.meleeStrength || mRaw.rangeStrength || mRaw.magicStrength || 20, 0, false, 0);
+          const tD = buildScore(skills.dodge || 20, tDefGear, 0, true, 0);
+          const tsDef = buildScore(skills.defend || 20, tDefGear, 0, true, 0);
+
+          const hc = hitChanceFromScores(mA, tD);
+          if (Math.random() < hc.chance) {
+            const maxH = maxHit(msAtk);
+            const red = damageReduction(tsDef);
+            const minH = minHitFloor(hc.overflow, maxH);
+            const rawDmg = minH + Math.floor(Math.random() * (maxH - minH + 1));
+            const dmg = finalDamage(rawDmg, red);
+
+            target.hp -= dmg;
+            totalDamageTaken += dmg;
+
+            // Trigger immediate eat check
+            if (target.hp <= target.maxHp * (autoEatThreshold / 100) && target.eatCooldown <= 0) {
+              target.hp = Math.min(target.maxHp, target.hp + foodHeal);
+              target.eatCooldown = CM_CONSTS.FOOD_AUTO_EAT_COOLDOWN_SEC;
+              waveFoodCount++;
+              totalFoodEaten++;
+            }
+          }
+        }
+      });
+
+      waveTime += dt;
+    }
+
+    totalCombatTime += waveTime;
+    waveTimes.push(waveTime);
+    waveFood.push(waveFoodCount);
+
+    if (waveWon) {
+      wavesCleared++;
+      if (wIdx < waves.length - 1) {
+        totalRespawnTime += waveRespawnDelay;
+      }
+    } else {
+      break; // Wiped on this wave
+    }
+  }
+
+  return {
+    won: (wavesCleared === waves.length),
+    wavesCleared,
+    totalTime: totalCombatTime + totalRespawnTime,
+    combatTime: totalCombatTime,
+    respawnTime: totalRespawnTime,
+    totalFoodEaten,
+    totalDamageDealt,
+    totalDamageTaken,
+    waveTimes,
+    waveFood
+  };
+}
+
+// Run Monte Carlo Simulation (50 runs)
+function runDungeonSimulation() {
+  const partyLoadouts = [];
+  const loadouts = getAvailablePlayerLoadouts();
+  const ldMap = {};
+  loadouts.forEach(l => { ldMap[l.id] = l; });
+
+  for (let i = 0; i < currentPartySize; i++) {
+    const sel = document.getElementById('selPartySlot_' + i);
+    const chosenId = sel ? sel.value : (loadouts[0] ? loadouts[0].id : 'magic_1');
+    partyLoadouts.push(ldMap[chosenId] || loadouts[0]);
+  }
+
+  const waves = getDungeonWaves(currentDungeonDiff);
+  const foodSelect = document.getElementById('selDungeonFood');
+  const foodId = foodSelect ? foodSelect.value : 'shark';
+  const foodMap = {
+    shark: 48, whale: 52, manta: 36, lobster: 24, crab: 18, perch: 12, shrimp: 6
+  };
+  const foodHeal = foodMap[foodId] || 48;
+  const autoEatThreshold = parseInt(document.getElementById('rngAutoEatThreshold').value) || 75;
+  const hostReduction = (currentAudit && currentAudit.respawnReduction) || 0;
+
+  const runsCount = 50;
+  let wins = 0;
+  let sumWaves = 0;
+  let sumTotalTime = 0;
+  let sumCombatTime = 0;
+  let sumRespawnTime = 0;
+  let sumFood = 0;
+  let sumDmg = 0;
+
+  const waveClearsCount = new Array(waves.length).fill(0);
+  const waveTimeSum = new Array(waves.length).fill(0);
+  const waveFoodSum = new Array(waves.length).fill(0);
+
+  for (let r = 0; r < runsCount; r++) {
+    const res = runSimOnce(partyLoadouts, waves, foodHeal, autoEatThreshold, hostReduction);
+    if (res.won) wins++;
+    sumWaves += res.wavesCleared;
+    sumTotalTime += res.totalTime;
+    sumCombatTime += res.combatTime;
+    sumRespawnTime += res.respawnTime;
+    sumFood += res.totalFoodEaten;
+    sumDmg += res.totalDamageDealt;
+
+    for (let w = 0; w < res.wavesCleared; w++) {
+      waveClearsCount[w]++;
+      waveTimeSum[w] += (res.waveTimes[w] || 0);
+      waveFoodSum[w] += (res.waveFood[w] || 0);
+    }
+  }
+
+  const winRate = (wins / runsCount) * 100;
+  const avgWaves = sumWaves / runsCount;
+  const avgTotalTime = sumTotalTime / runsCount;
+  const avgCombatTime = sumCombatTime / runsCount;
+  const avgRespawnTime = sumRespawnTime / runsCount;
+  const avgFood = sumFood / runsCount;
+  const foodPerHour = (avgTotalTime > 0) ? Math.round((avgFood / avgTotalTime) * 3600) : 0;
+
+  // Update KPI Cards
+  document.getElementById('resDungeonWinRate').textContent = winRate.toFixed(1) + '%';
+  document.getElementById('resDungeonWinRate').style.color = (winRate >= 95) ? 'var(--success)' : ((winRate >= 70) ? 'var(--accent)' : 'var(--danger)');
+  document.getElementById('resDungeonClearStatus').textContent = (winRate === 100) ? '100% Guaranteed Clear' : ((winRate >= 70) ? 'High Win Rate (Minor Wipe Risk)' : 'Dangerous (Gear/Food Upgrade Needed)');
+
+  document.getElementById('resDungeonWavesCleared').textContent = avgWaves.toFixed(1) + ' / ' + waves.length;
+  document.getElementById('resDungeonWaveProgress').textContent = (avgWaves === waves.length) ? 'All waves cleared consistently' : 'Wipes typically around wave ' + Math.ceil(avgWaves);
+
+  const mins = Math.floor(avgTotalTime / 60);
+  const secs = Math.round(avgTotalTime % 60);
+  document.getElementById('resDungeonTTK').textContent = mins + 'm ' + secs + 's';
+  document.getElementById('resDungeonTimeBreakdown').textContent = Math.round(avgCombatTime) + 's combat + ' + Math.round(avgRespawnTime) + 's respawns';
+
+  document.getElementById('resDungeonFoodEaten').textContent = avgFood.toFixed(1) + ' ' + foodId;
+  document.getElementById('resDungeonFoodPerHour').textContent = '~' + foodPerHour.toLocaleString() + ' food / hour';
+
+  // Render Wave Breakdown Table
+  renderWaveBreakdownTable(waves, waveClearsCount, waveTimeSum, waveFoodSum, runsCount);
+}
+
+function renderWaveBreakdownTable(waves, waveClearsCount, waveTimeSum, waveFoodSum, runsCount) {
+  const tbody = document.getElementById('tblDungeonWavesBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  waves.forEach((wMobs, idx) => {
+    const clears = waveClearsCount[idx] || 0;
+    const survivalPct = ((clears / runsCount) * 100).toFixed(0);
+    const avgTime = clears > 0 ? (waveTimeSum[idx] / clears).toFixed(1) : '--';
+    const avgFood = clears > 0 ? (waveFoodSum[idx] / clears).toFixed(1) : '--';
+
+    const chips = wMobs.map(mId => {
+      const m = MOBS_DATA[mId] || { name: mId, attackStyle: 'slash' };
+      return `<span class="enemy-chip"><strong>${m.name}</strong> <span class="style-pill ${m.attackStyle}">${m.attackStyle}</span></span>`;
+    }).join(' ');
+
+    // Styles & vulnerabilities
+    const styles = Array.from(new Set(wMobs.map(mId => (MOBS_DATA[mId] ? MOBS_DATA[mId].attackStyle : 'slash'))));
+    const stylePills = styles.map(s => `<span class="style-pill ${s}">${s}</span>`).join(' ');
+
+    // Check lowest defense among these mobs
+    let minMagic = 999, minRange = 999, minMelee = 999;
+    wMobs.forEach(mId => {
+      const m = MOBS_DATA[mId];
+      if (m) {
+        minMagic = Math.min(minMagic, m.magicDefense || 0);
+        minRange = Math.min(minRange, m.rangeDefense || 0);
+        minMelee = Math.min(minMelee, m.slashDefense || 0, m.crushDefense || 0, m.stabDefense || 0);
+      }
+    });
+
+    let weakText = '';
+    if (minMagic <= minRange && minMagic <= minMelee) weakText = `<span class="enemy-weakness-badge">Weak to Magic (${minMagic} def)</span>`;
+    else if (minRange <= minMagic && minRange <= minMelee) weakText = `<span class="enemy-weakness-badge" style="background:rgba(34,197,94,0.2);color:#4ade80;">Weak to Range (${minRange} def)</span>`;
+    else weakText = `<span class="enemy-weakness-badge" style="background:rgba(239,68,68,0.2);color:#f87171;">Weak to Melee (${minMelee} def)</span>`;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>Wave ${idx + 1}</strong></td>
+      <td><div class="enemy-chips-container">${chips}</div></td>
+      <td>${stylePills}</td>
+      <td>${weakText}</td>
+      <td><strong>${avgTime}s</strong></td>
+      <td>${avgFood}</td>
+      <td><span style="font-weight:700;color:${survivalPct >= 90 ? 'var(--success)' : (survivalPct >= 50 ? 'var(--accent)' : 'var(--danger)')}">${survivalPct}%</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// --- PARTY LOADOUT SOLVER & OPTIMIZER ---
+function solveBestDungeonLoadout() {
+  const loadouts = getAvailablePlayerLoadouts();
+  const waves = getDungeonWaves(currentDungeonDiff);
+  const foodSelect = document.getElementById('selDungeonFood');
+  const foodId = foodSelect ? foodSelect.value : 'shark';
+  const foodMap = { shark: 48, whale: 52, manta: 36, lobster: 24, crab: 18, perch: 12, shrimp: 6 };
+  const foodHeal = foodMap[foodId] || 48;
+  const autoEatThreshold = parseInt(document.getElementById('rngAutoEatThreshold').value) || 75;
+  const hostReduction = (currentAudit && currentAudit.respawnReduction) || 0;
+
+  // Analyze waves to find predominant monster weaknesses and threats
+  let magicDefSum = 0, rangeDefSum = 0, meleeDefSum = 0;
+  const incomingStyles = {};
+
+  waves.forEach(w => {
+    w.forEach(mId => {
+      const m = MOBS_DATA[mId];
+      if (m) {
+        magicDefSum += (m.magicDefense || 0);
+        rangeDefSum += (m.rangeDefense || 0);
+        meleeDefSum += ((m.slashDefense || 0) + (m.crushDefense || 0) + (m.stabDefense || 0)) / 3;
+        const st = m.attackStyle || 'slash';
+        incomingStyles[st] = (incomingStyles[st] || 0) + 1;
+      }
+    });
+  });
+
+  // Candidate comp archetypes to evaluate
+  const compsToTest = [];
+
+  // 1. Mono comps
+  loadouts.forEach(ld => {
+    compsToTest.push(new Array(currentPartySize).fill(ld));
+  });
+
+  // 2. Dual comps (e.g. Magic + Range, Magic + Melee)
+  if (loadouts.length >= 2) {
+    for (let i = 0; i < loadouts.length; i++) {
+      for (let j = 0; j < loadouts.length; j++) {
+        if (i !== j) {
+          const c = [];
+          for (let s = 0; s < currentPartySize; s++) {
+            c.push((s % 2 === 0) ? loadouts[i] : loadouts[j]);
+          }
+          compsToTest.push(c);
+        }
+      }
+    }
+  }
+
+  // 3. Stacking 3 of one, 2 of another
+  if (loadouts.length >= 2 && currentPartySize >= 5) {
+    for (let i = 0; i < loadouts.length; i++) {
+      for (let j = 0; j < loadouts.length; j++) {
+        if (i !== j) {
+          compsToTest.push([loadouts[i], loadouts[i], loadouts[i], loadouts[j], loadouts[j]]);
+        }
+      }
+    }
+  }
+
+  let bestComp = null;
+  let bestScore = -999999;
+  const runsPerCandidate = 25;
+
+  compsToTest.forEach(comp => {
+    let wins = 0;
+    let sumWaves = 0;
+    let sumTime = 0;
+    let sumFood = 0;
+
+    for (let r = 0; r < runsPerCandidate; r++) {
+      const res = runSimOnce(comp, waves, foodHeal, autoEatThreshold, hostReduction);
+      if (res.won) wins++;
+      sumWaves += res.wavesCleared;
+      sumTime += res.totalTime;
+      sumFood += res.totalFoodEaten;
+    }
+
+    const winRate = wins / runsPerCandidate;
+    const avgWaves = sumWaves / runsPerCandidate;
+    const avgTime = sumTime / runsPerCandidate;
+    const avgFood = sumFood / runsPerCandidate;
+
+    // Score prioritizing winRate, then waves cleared, then faster TTK, then lower food
+    const score = (winRate * 10000) + (avgWaves * 500) - (avgTime * 2) - (avgFood * 5);
+
+    if (!bestComp || score > bestScore) {
+      bestScore = score;
+      bestComp = {
+        comp,
+        winRate: (winRate * 100).toFixed(1),
+        avgWaves: avgWaves.toFixed(1),
+        avgTime,
+        avgFood: avgFood.toFixed(1)
+      };
+    }
+  });
+
+  currentBestComp = bestComp;
+
+  // Render Best Loadout Banner
+  renderBestLoadoutBanner(bestComp, magicDefSum, rangeDefSum, meleeDefSum, incomingStyles);
+
+  // Apply to manual slots and run 100 simulation runs for high accuracy
+  applyBestLoadoutToParty();
+  runDungeonSimulation();
+}
+
+function renderBestLoadoutBanner(best, magicDefSum, rangeDefSum, meleeDefSum, incomingStyles) {
+  const grid = document.getElementById('gridBestLoadoutSlots');
+  if (!grid || !best) return;
+  grid.innerHTML = '';
+
+  best.comp.forEach((ld, idx) => {
+    const isHost = (idx === 0);
+    const box = document.createElement('div');
+    box.className = 'loadout-slot-box' + (isHost ? ' host' : '');
+    box.innerHTML = `
+      <div class="role-label">
+        <span>${isHost ? '👑 Host (You)' : '👥 Clone ' + idx}</span>
+        <span class="style-pill ${ld.style}">${ld.style}</span>
+      </div>
+      <div class="loadout-title">
+        <span>${ld.name}</span>
+      </div>
+      <div class="loadout-desc">
+        Speed: ${ld.stats.attackSpeed || 3.5}s · Focus on ${ld.style} offensive stats
+      </div>
+    `;
+    grid.appendChild(box);
+  });
+
+  // Strategic Rationale Text
+  const totalEnemyAttacks = Object.values(incomingStyles).reduce((a, b) => a + b, 0);
+  const topIncoming = Object.entries(incomingStyles).sort((a, b) => b[1] - a[1])[0];
+  const topIncomingStyle = topIncoming ? topIncoming[0] : 'slash';
+
+  let weakStyle = 'Magic';
+  if (rangeDefSum <= magicDefSum && rangeDefSum <= meleeDefSum) weakStyle = 'Range';
+  else if (meleeDefSum <= magicDefSum && meleeDefSum <= rangeDefSum) weakStyle = 'Melee';
+
+  document.getElementById('lblStrategicRationale').innerHTML = `
+    <strong>Enemy Vulnerability:</strong> Across all ${getDungeonWaves(currentDungeonDiff).length} waves, enemies exhibit lowest average defensive resistance against <strong>${weakStyle}</strong>. Stacking ${best.comp.filter(c => c.style === weakStyle.toLowerCase()).length}x ${weakStyle} weapons exploits this gap to maximize damage output and clear waves rapidly.<br>
+    <strong>Damage Mitigation:</strong> The primary incoming threat is <strong>${topIncomingStyle.toUpperCase()}</strong> attacks. The recommended loadout balances defensive scores against ${topIncomingStyle}, cutting incoming hits and saving valuable food charges.
+  `;
+}
+
+function applyBestLoadoutToParty() {
+  if (!currentBestComp) return;
+  currentBestComp.comp.forEach((ld, idx) => {
+    const sel = document.getElementById('selPartySlot_' + idx);
+    if (sel) sel.value = ld.id;
+  });
+}
+
+// Initialize Dungeon Simulator on load
+function initDungeon() {
+  updateDungeonUI();
+  solveBestDungeonLoadout();
+}
+
+
+window.onload = function() { init(); initDungeon(); };
 </script>
 </body>
 </html>
