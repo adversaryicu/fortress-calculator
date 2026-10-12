@@ -1165,14 +1165,47 @@
         return ClientState.bank[id] || 0;
     };
 
-    // Calculate effective heal bonus from cape/pet/spices
+    // Robust Effective Food Heal Bonus & Spice Multiplier (matches ItemSlotRenderer parity)
     let healBonus = 0;
-    if (typeof ActivePotionsPanel !== 'undefined' && typeof ActivePotionsPanel._computeHealBonus === 'function') {
-        healBonus = ActivePotionsPanel._computeHealBonus();
-    }
-    let healMult = 1;
-    if (typeof ActivePotionsPanel !== 'undefined' && typeof ActivePotionsPanel._foodHealMult === 'function') {
-        healMult = ActivePotionsPanel._foodHealMult();
+    try {
+        const pets = ClientState.pets || {};
+        const capes = ClientState.capes || {};
+        if (pets.life) {
+            if (pets.life.normal >= 1) healBonus++;
+            if (pets.life.shiny >= 1) healBonus++;
+        }
+        if (capes.life) {
+            if (capes.life.skillCape) healBonus++;
+            if (capes.life.trimmedCape) healBonus++;
+        }
+        if (capes.maxCape) healBonus++;
+        if (capes.trimmedMaxCape) healBonus++;
+        if (pets.allSkills) {
+            if (pets.allSkills.normal >= 1) healBonus++;
+            if (pets.allSkills.shiny >= 1) healBonus++;
+        }
+    } catch (e) {}
+
+    let healMult = 1.0;
+    try {
+        const spices = (ClientState.unlocks && ClientState.unlocks.spices) || {};
+        let spiceCount = 0;
+        for (const k in spices) { if (spices[k]) spiceCount++; }
+        const spicePer = (typeof Constants !== 'undefined' && Constants.SPICE_FOOD_HEAL_BONUS) || 0.1;
+        healMult = 1 + (spiceCount * spicePer);
+    } catch (e) {}
+
+    if (typeof ActivePotionsPanel !== 'undefined') {
+        try {
+            if (typeof ActivePotionsPanel._computeHealBonus === 'function') {
+                const b = ActivePotionsPanel._computeHealBonus();
+                if (b > healBonus) healBonus = b;
+            }
+            if (typeof ActivePotionsPanel._foodHealMult === 'function') {
+                const m = ActivePotionsPanel._foodHealMult();
+                if (m > healMult) healMult = m;
+            }
+        } catch (e) {}
     }
 
     // Scan all Foods (Cooked) in Bank/Inventory
@@ -1203,21 +1236,45 @@
         if (q > 0) rawFish[id] = q;
     });
 
-    // Active Potions with full details (charges/attacks remaining, tier, exact boost)
+    // Helper to parse potion tier, boost & name accurately from ID
+    const parsePotionEntry = (entry) => {
+        const id = entry.potionId || '';
+        let tier = 0;
+        let boost = 0;
+        if (typeof Constants !== 'undefined' && Constants.COMBAT_POTION_BOOSTS && Constants.COMBAT_POTION_BOOSTS[id]) {
+            const c = Constants.COMBAT_POTION_BOOSTS[id];
+            tier = c.tier !== undefined ? c.tier : 0;
+            boost = c.acc || c.dodge || ((tier + 1) * 2);
+        } else {
+            const m = id.match(/_t(\d+)/);
+            if (m) tier = parseInt(m[1], 10);
+            boost = (tier + 1) * 2;
+        }
+        const itemData = (ClientState.itemsData && ClientState.itemsData[id]) || {};
+        let name = itemData.name || '';
+        if (!name) {
+            const parts = id.split('_');
+            const cap = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+            name = `[T${tier}] ${cap} Potion`;
+        }
+        return {
+            potionId: id,
+            name: name,
+            tier: tier,
+            boost: boost,
+            attacksRemaining: entry.attacksRemaining || 0
+        };
+    };
+
+    // Active Potions with full queue extraction (head + queued entries)
     const activePotions = {};
     if (ClientState.activePotions) {
         ['melee', 'ranged', 'magic', 'defensive'].forEach(st => {
             const queue = ClientState.activePotions[st];
             if (queue && queue.length > 0) {
-                const active = queue[0];
-                const boost = (typeof Constants !== 'undefined' && Constants.COMBAT_POTION_BOOSTS) 
-                    ? Constants.COMBAT_POTION_BOOSTS[active.potionId] : null;
-                activePotions[st] = {
-                    potionId: active.potionId,
-                    tier: active.tier !== undefined ? active.tier : 0,
-                    attacksRemaining: active.attacksRemaining || 0,
-                    boost: boost || {}
-                };
+                const head = parsePotionEntry(queue[0]);
+                head.queue = queue.map(parsePotionEntry);
+                activePotions[st] = head;
             }
         });
     }
@@ -3844,11 +3901,15 @@ function runDungeonSimulation() {
 
   const waves = getDungeonWaves(currentDungeonDiff);
   const foodSelect = document.getElementById('selDungeonFood');
-  const foodId = foodSelect ? foodSelect.value : 'shark';
-  const foodMap = {
-    shark: 48, whale: 52, manta: 36, lobster: 24, crab: 18, perch: 12, shrimp: 6
-  };
-  const foodHeal = foodMap[foodId] || 48;
+  const foodId = foodSelect ? foodSelect.value : 'squid';
+  let foodHeal = 28;
+  if (currentAudit && currentAudit.foods) {
+    const fObj = currentAudit.foods.find(f => f.id === foodId);
+    if (fObj) foodHeal = fObj.effectiveHeal || fObj.healHP || 28;
+  } else {
+    const foodMap = { whale: 52, shark: 48, jelly: 44, stinger: 40, manta: 36, octopus: 32, squid: 28, lobster: 24, crab: 18, perch: 12, shrimp: 6 };
+    foodHeal = foodMap[foodId] || 28;
+  }
   const autoEatThreshold = parseInt(document.getElementById('rngAutoEatThreshold').value) || 75;
   const hostReduction = (currentAudit && currentAudit.respawnReduction) || 0;
 
@@ -4172,6 +4233,10 @@ function updateCraftingRecommendations() {
     if (chipFood) chipFood.innerHTML = '🐟 Food: <em>Paste JSON in Step 2</em>';
     const chipMagic = document.getElementById('chipLiveMagicPot');
     if (chipMagic) chipMagic.innerHTML = '🔮 Magic: <em>Paste JSON in Step 2</em>';
+    const chipMelee = document.getElementById('chipLiveMeleePot');
+    if (chipMelee) { chipMelee.style.opacity = '0.5'; chipMelee.innerHTML = '⚔️ Melee: <em>None active</em>'; }
+    const chipDef = document.getElementById('chipLiveDefPot');
+    if (chipDef) { chipDef.style.opacity = '0.5'; chipDef.innerHTML = '🛡️ Defense: <em>None active</em>'; }
 
     const awaitCard = document.createElement('div');
     awaitCard.className = 'crafting-action-card';
@@ -4212,7 +4277,8 @@ function updateCraftingRecommendations() {
     currentAudit.foods.forEach((f, idx) => {
       const opt = document.createElement('option');
       opt.value = f.id;
-      opt.textContent = `${f.name} (+${f.effectiveHeal || f.healHP} HP) - ${f.qty.toLocaleString()} in stock`;
+      const healDisplay = f.effectiveHeal || f.healHP;
+      opt.textContent = `${f.name} (+${healDisplay} HP) - ${f.qty.toLocaleString()} in stock`;
       if (idx === 0) opt.selected = true;
       foodSelect.appendChild(opt);
     });
@@ -4236,7 +4302,8 @@ function updateCraftingRecommendations() {
   const chipFood = document.getElementById('chipLiveFood');
   if (chipFood) {
     if (activeStockFood) {
-      chipFood.innerHTML = `🐟 Food: <strong>${activeStockFood.name} (+${activeStockFood.effectiveHeal || activeStockFood.healHP} HP) · ${activeStockFood.qty.toLocaleString()} in stock</strong>`;
+      const healDisplay = activeStockFood.effectiveHeal || activeStockFood.healHP;
+      chipFood.innerHTML = `🐟 Food: <strong>${activeStockFood.name} (+${healDisplay} HP) · ${activeStockFood.qty.toLocaleString()} in stock</strong>`;
     } else {
       chipFood.innerHTML = `🐟 Food: <em>No food in bank</em>`;
     }
@@ -4246,10 +4313,14 @@ function updateCraftingRecommendations() {
   const chipMagic = document.getElementById('chipLiveMagicPot');
   if (chipMagic) {
     if (activeMagic) {
-      const pTier = activeMagic.tier !== undefined ? activeMagic.tier : 0;
-      const pBoost = (pTier + 1) * 2;
+      const pName = activeMagic.name || `[T${activeMagic.tier}] Magic Potion`;
+      const pBoost = activeMagic.boost || ((activeMagic.tier + 1) * 2);
       const left = activeMagic.attacksRemaining || 0;
-      chipMagic.innerHTML = `🔮 Magic: <strong>[T${pTier}] Mystic (+${pBoost}) · ${left.toLocaleString()} attacks</strong>`;
+      chipMagic.innerHTML = `🔮 Magic: <strong>${pName} (+${pBoost}) · ${left.toLocaleString()} attacks</strong>`;
+      if (activeMagic.queue && activeMagic.queue.length > 1) {
+        const qText = activeMagic.queue.map(q => `${q.name} (${q.attacksRemaining})`).join(', ');
+        chipMagic.title = `Queue: ${qText}`;
+      }
     } else {
       chipMagic.innerHTML = `🔮 Magic: <em>None active</em>`;
     }
@@ -4260,7 +4331,10 @@ function updateCraftingRecommendations() {
   if (chipMelee) {
     if (activeMelee) {
       chipMelee.style.opacity = '1';
-      chipMelee.innerHTML = `⚔️ Melee: <strong>[T${activeMelee.tier || 0}] · ${(activeMelee.attacksRemaining || 0).toLocaleString()} attacks</strong>`;
+      const pName = activeMelee.name || `[T${activeMelee.tier}] Melee Potion`;
+      const pBoost = activeMelee.boost || ((activeMelee.tier + 1) * 2);
+      const left = activeMelee.attacksRemaining || 0;
+      chipMelee.innerHTML = `⚔️ Melee: <strong>${pName} (+${pBoost}) · ${left.toLocaleString()} attacks</strong>`;
     } else {
       chipMelee.style.opacity = '0.5';
       chipMelee.innerHTML = `⚔️ Melee: <em>None active</em>`;
@@ -4272,7 +4346,10 @@ function updateCraftingRecommendations() {
   if (chipDef) {
     if (activeDef) {
       chipDef.style.opacity = '1';
-      chipDef.innerHTML = `🛡️ Defense: <strong>[T${activeDef.tier || 0}] · ${(activeDef.attacksRemaining || 0).toLocaleString()} attacks</strong>`;
+      const pName = activeDef.name || `[T${activeDef.tier}] Defense Potion`;
+      const pBoost = activeDef.boost || ((activeDef.tier + 1) * 2);
+      const left = activeDef.attacksRemaining || 0;
+      chipDef.innerHTML = `🛡️ Defense: <strong>${pName} (+${pBoost}) · ${left.toLocaleString()} attacks</strong>`;
     } else {
       chipDef.style.opacity = '0.5';
       chipDef.innerHTML = `🛡️ Defense: <em>None active</em>`;
@@ -4284,7 +4361,7 @@ function updateCraftingRecommendations() {
   const foodObj = (currentAudit.foods) ? currentAudit.foods.find(f => f.id === selFoodId) : null;
   const currentStock = foodObj ? foodObj.qty : 0;
 
-  const foodPerRun = window._lastAvgFoodPerRun || 14.2;
+  const foodPerRun = window._lastAvgFoodPerRun || 5.3;
   const totalFoodNeeded = Math.ceil(foodPerRun * sessionTargetRuns);
   const foodDeficit = Math.max(0, totalFoodNeeded - currentStock);
   const rawQty = (currentAudit.rawFish && currentAudit.rawFish['raw_' + selFoodId]) || 0;
@@ -4313,11 +4390,27 @@ function updateCraftingRecommendations() {
   const potCard = document.createElement('div');
   potCard.className = 'crafting-action-card potion';
 
-  const activeTier = activeMagic ? (activeMagic.tier !== undefined ? activeMagic.tier : 0) : -1;
+  const activeTier = activeMagic ? (activeMagic.tier !== undefined ? activeMagic.tier : -1) : -1;
   const attacksLeft = activeMagic ? (activeMagic.attacksRemaining || 0) : 0;
-  const maxBrewTier = Math.min(10, Math.floor(brewLvl / 10));
+  const totalAttacksInQueue = (activeMagic && activeMagic.queue)
+    ? activeMagic.queue.reduce((acc, q) => acc + (q.attacksRemaining || 0), 0)
+    : attacksLeft;
+  const maxBrewTier = Math.min(10, Math.floor(brewLvl / 10)); // e.g. Lv 39 -> T3
 
-  if (maxBrewTier > activeTier) {
+  if (activeMagic && activeTier >= maxBrewTier) {
+    const isHigher = activeTier > maxBrewTier;
+    potCard.innerHTML = `
+      <div class="crafting-target-headline">
+        <span>🧪 Active Combat Potion: ${activeMagic.name} (+${activeMagic.boost} Magic)</span>
+        <span class="crafting-stock-badge" style="background:rgba(16,185,129,0.15);color:#4ade80;border-color:rgba(16,185,129,0.3);">
+          ${isHigher ? 'Active Tier Exceeds Unlocked (T' + activeTier + ' vs T' + maxBrewTier + ')' : 'Max Unlocked Tier Active (T' + activeTier + ')'}
+        </span>
+      </div>
+      <div class="crafting-desc">
+        Your active magic potion is <strong>${activeMagic.name} (+${activeMagic.boost} Magic)</strong> with <strong>${attacksLeft.toLocaleString()} attacks remaining</strong>${totalAttacksInQueue > attacksLeft ? ` (${totalAttacksInQueue.toLocaleString()} total attacks queued across all tiers)` : ''}. Your Brewing skill is <strong>Level ${brewLvl}</strong> (crafts up to <strong>Tier ${maxBrewTier}</strong>). Because your active potion is already <strong>Tier ${activeTier}</strong>, no brewing upgrades are needed.
+      </div>
+    `;
+  } else if (maxBrewTier > activeTier) {
     const targetPotName = (maxBrewTier >= 8) ? '[T' + maxBrewTier + '] Cosmic Potion' : ((maxBrewTier >= 4) ? '[T' + maxBrewTier + '] Arcane Potion' : '[T' + maxBrewTier + '] Mystic Potion');
     const potBoost = (maxBrewTier + 1) * 2;
     potCard.innerHTML = `
@@ -4327,7 +4420,7 @@ function updateCraftingRecommendations() {
       </div>
       <div class="crafting-desc">
         ${activeMagic 
-          ? `Your currently active potion is <strong>[T${activeTier}] Mystic (+${(activeTier + 1) * 2} Magic)</strong> with ${attacksLeft.toLocaleString()} attacks remaining. Your Brewing is <strong>Level ${brewLvl}</strong> (unlocks <strong>${targetPotName} +${potBoost}</strong>). Upgrading will boost party magic DPS by ~<strong>+${(maxBrewTier - activeTier) * 6}%</strong>, clearing waves faster and reducing food consumption.`
+          ? `Your currently active potion is <strong>${activeMagic.name} (+${activeMagic.boost} Magic)</strong> with ${attacksLeft.toLocaleString()} attacks remaining. Your Brewing is <strong>Level ${brewLvl}</strong> (unlocks <strong>${targetPotName} +${potBoost}</strong>). Upgrading will boost party magic DPS by ~<strong>+${(maxBrewTier - activeTier) * 6}%</strong>, clearing waves faster and reducing food consumption.`
           : `You have no active combat potions. Your Brewing is <strong>Level ${brewLvl}</strong> (unlocks <strong>${targetPotName} +${potBoost}</strong>). Brewing and consuming 2 potions provides ~2,000 boosted attacks for your runs.`}
       </div>
     `;
@@ -4338,7 +4431,7 @@ function updateCraftingRecommendations() {
         <span class="crafting-stock-badge">Sufficient Charges (${attacksLeft.toLocaleString()} Attacks)</span>
       </div>
       <div class="crafting-desc">
-        Your active magic potion is at your highest unlocked Brewing tier (Level ${brewLvl}) with ${attacksLeft.toLocaleString()} attacks remaining (covers ~${Math.max(1, Math.floor(attacksLeft / 16))} dungeon runs).
+        Your active magic potion is at your highest unlocked Brewing tier (Level ${brewLvl}) with ${attacksLeft.toLocaleString()} attacks remaining.
       </div>
     `;
   }
