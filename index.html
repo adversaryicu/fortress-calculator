@@ -1700,32 +1700,39 @@
       <div class="card">
         <div class="card-title">
           <span>Consumables, Buffs & Crafting Advisor</span>
-          <span style="font-size: 12px; color: var(--accent);" id="lblActiveFoodMeta">Live Buff Detection</span>
+          <span style="font-size: 12px; color: var(--text-muted);" id="lblActiveFoodMeta">Awaiting Audit Data</span>
         </div>
 
         <!-- 1. Detected Live Consumables Row -->
         <div style="background: rgba(9, 13, 22, 0.85); border: 1px solid #1e293b; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
             <strong style="font-size: 12px; color: #fff;">🍲 Detected Active Consumables in Bank / Active</strong>
-            <span class="crafting-stock-badge" id="lblLiveFoodStock">65 Squid in Stock</span>
+            <span class="crafting-stock-badge warning" id="lblLiveFoodStock">No Data Loaded</span>
           </div>
           <div style="display:flex; gap: 8px; flex-wrap:wrap;" id="rowDetectedBuffs">
-            <span class="detected-buff-chip" id="chipLiveFood">🐟 Food: <strong>[T4] Squid (+33 HP)</strong></span>
-            <span class="detected-buff-chip" id="chipLiveMagicPot">🔮 Magic: <strong>[T0] Mystic (+2) · 1,628 attacks</strong></span>
-            <span class="detected-buff-chip" id="chipLiveMeleePot" style="opacity:0.6;">⚔️ Melee: <em>None active</em></span>
-            <span class="detected-buff-chip" id="chipLiveDefPot" style="opacity:0.6;">🛡️ Defense: <em>None active</em></span>
+            <span class="detected-buff-chip" id="chipLiveFood" style="opacity:0.7;">🐟 Food: <em>Paste JSON in Step 2</em></span>
+            <span class="detected-buff-chip" id="chipLiveMagicPot" style="opacity:0.7;">🔮 Magic: <em>Paste JSON in Step 2</em></span>
+            <span class="detected-buff-chip" id="chipLiveMeleePot" style="opacity:0.5;">⚔️ Melee: <em>None active</em></span>
+            <span class="detected-buff-chip" id="chipLiveDefPot" style="opacity:0.5;">🛡️ Defense: <em>None active</em></span>
           </div>
         </div>
 
         <!-- Food Selector & Auto-Eat Slider -->
         <div class="party-controls" style="grid-template-columns: 1fr 1fr;">
           <div class="control-group">
-            <label>Food Selection <span style="font-size:10px;color:var(--primary);" id="lblFoodSelectedDetail">(Auto-Detected)</span></label>
+            <label>Food Selection <span style="font-size:10px;color:var(--text-muted);" id="lblFoodSelectedDetail">(Preset)</span></label>
             <select id="selDungeonFood" onchange="onFoodSelectionChanged()">
-              <option value="squid" selected>[T4] Squid (+33 HP) - 65 in stock</option>
-              <option value="lobster">[T3] Lobster (+28 HP) - 120 in stock</option>
-              <option value="shark">[T9] Shark (+55 HP) - 0 in stock</option>
-              <option value="whale">[T10] Whale (+59 HP) - 0 in stock</option>
+              <option value="whale">[T10] Whale (+52 HP)</option>
+              <option value="shark" selected>[T9] Shark (+48 HP)</option>
+              <option value="jelly">[T8] Jelly (+44 HP)</option>
+              <option value="stinger">[T7] Stinger (+40 HP)</option>
+              <option value="manta">[T6] Manta (+36 HP)</option>
+              <option value="octopus">[T5] Octopus (+32 HP)</option>
+              <option value="squid">[T4] Squid (+28 HP)</option>
+              <option value="lobster">[T3] Lobster (+24 HP)</option>
+              <option value="crab">[T2] Crab (+18 HP)</option>
+              <option value="perch">[T1] Perch (+12 HP)</option>
+              <option value="shrimp">[T0] Shrimp (+6 HP)</option>
             </select>
           </div>
           <div class="control-group">
@@ -2101,12 +2108,15 @@ function onJsonInputChanged() {
   const raw = document.getElementById('txtJsonInput').value.trim();
   if (!raw) {
     document.getElementById('lblLoadedPlayer').textContent = "Awaiting Data...";
+    currentAudit = null;
     showEmptyState();
+    if (typeof updateCraftingRecommendations === 'function') updateCraftingRecommendations();
     return;
   }
   try {
     const data = JSON.parse(raw);
     currentAudit = data;
+    if (typeof updateCraftingRecommendations === 'function') updateCraftingRecommendations();
     if (data.player) {
       document.getElementById('lblLoadedPlayer').textContent = `Loaded: ${data.player}`;
     }
@@ -2141,7 +2151,11 @@ function onJsonInputChanged() {
 function init() {
   document.getElementById('txtJsonInput').value = '';
   document.getElementById('lblLoadedPlayer').textContent = 'Awaiting Data...';
+  currentAudit = null;
   showEmptyState();
+  if (typeof updateCraftingRecommendations === 'function') {
+    updateCraftingRecommendations();
+  }
 }
 
 function copyConsoleScript() {
@@ -4132,10 +4146,6 @@ function updateCraftingRecommendations() {
   if (!container) return;
   container.innerHTML = '';
 
-  const cookLvl = (currentAudit && currentAudit.combatSkills && currentAudit.combatSkills.cook) || 45;
-  const brewLvl = (currentAudit && currentAudit.combatSkills && currentAudit.combatSkills.brew) || 35;
-
-  // Max unlocked food
   const foodTiers = [
     { name: '[T10] Whale', minLvl: 100, baseHeal: 52, id: 'whale', rawId: 'raw_whale' },
     { name: '[T9] Shark', minLvl: 90, baseHeal: 48, id: 'shark', rawId: 'raw_shark' },
@@ -4150,22 +4160,136 @@ function updateCraftingRecommendations() {
     { name: '[T0] Shrimp', minLvl: 1, baseHeal: 6, id: 'shrimp', rawId: 'raw_shrimp' }
   ];
 
+  const hasCombatData = !!(currentAudit && (currentAudit.combatSkills || currentAudit.foods || currentAudit.activePotions));
+
+  // --- STATE 1: NO AUDIT DATA LOADED ---
+  if (!hasCombatData) {
+    const metaEl = document.getElementById('lblActiveFoodMeta');
+    if (metaEl) { metaEl.textContent = 'Awaiting Audit Data'; metaEl.style.color = 'var(--text-muted)'; }
+    const stockEl = document.getElementById('lblLiveFoodStock');
+    if (stockEl) { stockEl.textContent = 'No Data Loaded'; stockEl.className = 'crafting-stock-badge warning'; }
+    const chipFood = document.getElementById('chipLiveFood');
+    if (chipFood) chipFood.innerHTML = '🐟 Food: <em>Paste JSON in Step 2</em>';
+    const chipMagic = document.getElementById('chipLiveMagicPot');
+    if (chipMagic) chipMagic.innerHTML = '🔮 Magic: <em>Paste JSON in Step 2</em>';
+
+    const awaitCard = document.createElement('div');
+    awaitCard.className = 'crafting-action-card';
+    awaitCard.style.borderLeft = '4px solid var(--primary)';
+    awaitCard.style.background = 'rgba(15, 23, 42, 0.7)';
+    awaitCard.innerHTML = `
+      <div class="crafting-target-headline">
+        <span>📋 Awaiting Game Audit Data</span>
+        <span class="crafting-stock-badge" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">Step 1 & 2 Required</span>
+      </div>
+      <div class="crafting-desc">
+        To calculate your exact cooking targets, food deficits, and potion upgrades:
+        <ol style="margin: 6px 0 0 16px; padding: 0; line-height: 1.6;">
+          <li>Copy the <strong>Console Snippet (Step 1)</strong> and paste it into your game console (F12) while logged in.</li>
+          <li>Paste the copied JSON text into <strong>Audit Data (Step 2)</strong> above.</li>
+        </ol>
+        Once loaded, this card will automatically read your real Cooking & Brewing levels, exact bank food count, raw fish reserves, and optimal potion recommendations.
+      </div>
+    `;
+    container.appendChild(awaitCard);
+    return;
+  }
+
+  // --- STATE 2: REAL AUDIT DATA LOADED ---
+  const cookLvl = (currentAudit.combatSkills && currentAudit.combatSkills.cook) || 1;
+  const brewLvl = (currentAudit.combatSkills && currentAudit.combatSkills.brew) || 1;
+
+  const metaEl = document.getElementById('lblActiveFoodMeta');
+  if (metaEl) { 
+    metaEl.textContent = `Live Audit: ${currentAudit.player || 'Player'}`; 
+    metaEl.style.color = '#4ade80'; 
+  }
+
+  // Dynamically populate food select if foods exist
+  const foodSelect = document.getElementById('selDungeonFood');
+  if (foodSelect && currentAudit.foods && currentAudit.foods.length > 0 && !foodSelect._populatedWithAudit) {
+    foodSelect.innerHTML = '';
+    currentAudit.foods.forEach((f, idx) => {
+      const opt = document.createElement('option');
+      opt.value = f.id;
+      opt.textContent = `${f.name} (+${f.effectiveHeal || f.healHP} HP) - ${f.qty.toLocaleString()} in stock`;
+      if (idx === 0) opt.selected = true;
+      foodSelect.appendChild(opt);
+    });
+    foodSelect._populatedWithAudit = true;
+  }
+
+  const stockedFoods = (currentAudit.foods || []).filter(f => f.qty > 0);
+  const activeStockFood = stockedFoods[0] || null;
+
+  const stockEl = document.getElementById('lblLiveFoodStock');
+  if (stockEl) {
+    if (activeStockFood) {
+      stockEl.textContent = `${activeStockFood.qty.toLocaleString()} ${activeStockFood.name} in Stock`;
+      stockEl.className = 'crafting-stock-badge';
+    } else {
+      stockEl.textContent = 'No Food in Bank';
+      stockEl.className = 'crafting-stock-badge warning';
+    }
+  }
+
+  const chipFood = document.getElementById('chipLiveFood');
+  if (chipFood) {
+    if (activeStockFood) {
+      chipFood.innerHTML = `🐟 Food: <strong>${activeStockFood.name} (+${activeStockFood.effectiveHeal || activeStockFood.healHP} HP) · ${activeStockFood.qty.toLocaleString()} in stock</strong>`;
+    } else {
+      chipFood.innerHTML = `🐟 Food: <em>No food in bank</em>`;
+    }
+  }
+
+  const activeMagic = (currentAudit.activePotions && currentAudit.activePotions.magic);
+  const chipMagic = document.getElementById('chipLiveMagicPot');
+  if (chipMagic) {
+    if (activeMagic) {
+      const pTier = activeMagic.tier !== undefined ? activeMagic.tier : 0;
+      const pBoost = (pTier + 1) * 2;
+      const left = activeMagic.attacksRemaining || 0;
+      chipMagic.innerHTML = `🔮 Magic: <strong>[T${pTier}] Mystic (+${pBoost}) · ${left.toLocaleString()} attacks</strong>`;
+    } else {
+      chipMagic.innerHTML = `🔮 Magic: <em>None active</em>`;
+    }
+  }
+
+  const activeMelee = (currentAudit.activePotions && currentAudit.activePotions.melee);
+  const chipMelee = document.getElementById('chipLiveMeleePot');
+  if (chipMelee) {
+    if (activeMelee) {
+      chipMelee.style.opacity = '1';
+      chipMelee.innerHTML = `⚔️ Melee: <strong>[T${activeMelee.tier || 0}] · ${(activeMelee.attacksRemaining || 0).toLocaleString()} attacks</strong>`;
+    } else {
+      chipMelee.style.opacity = '0.5';
+      chipMelee.innerHTML = `⚔️ Melee: <em>None active</em>`;
+    }
+  }
+
+  const activeDef = (currentAudit.activePotions && currentAudit.activePotions.defensive);
+  const chipDef = document.getElementById('chipLiveDefPot');
+  if (chipDef) {
+    if (activeDef) {
+      chipDef.style.opacity = '1';
+      chipDef.innerHTML = `🛡️ Defense: <strong>[T${activeDef.tier || 0}] · ${(activeDef.attacksRemaining || 0).toLocaleString()} attacks</strong>`;
+    } else {
+      chipDef.style.opacity = '0.5';
+      chipDef.innerHTML = `🛡️ Defense: <em>None active</em>`;
+    }
+  }
+
   const maxUnlockedFood = foodTiers.find(f => cookLvl >= f.minLvl) || foodTiers[foodTiers.length - 1];
+  const selFoodId = foodSelect ? foodSelect.value : 'squid';
+  const foodObj = (currentAudit.foods) ? currentAudit.foods.find(f => f.id === selFoodId) : null;
+  const currentStock = foodObj ? foodObj.qty : 0;
 
-  // Selected food & simulation food consumption
-  const selFoodId = document.getElementById('selDungeonFood') ? document.getElementById('selDungeonFood').value : 'squid';
-  const foodObj = (currentAudit && currentAudit.foods) ? currentAudit.foods.find(f => f.id === selFoodId) : null;
-  const currentStock = foodObj ? foodObj.qty : 65;
-
-  // Estimate food needed for session
   const foodPerRun = window._lastAvgFoodPerRun || 14.2;
   const totalFoodNeeded = Math.ceil(foodPerRun * sessionTargetRuns);
   const foodDeficit = Math.max(0, totalFoodNeeded - currentStock);
+  const rawQty = (currentAudit.rawFish && currentAudit.rawFish['raw_' + selFoodId]) || 0;
 
-  // Raw fish in bank
-  const rawQty = (currentAudit && currentAudit.rawFish && currentAudit.rawFish['raw_' + selFoodId]) || 240;
-
-  // 1. FOOD CRAFTING CARD
+  // 1. Food Card
   const foodCard = document.createElement('div');
   foodCard.className = 'crafting-action-card food';
   const foodStatusHtml = (foodDeficit > 0)
@@ -4180,21 +4304,17 @@ function updateCraftingRecommendations() {
     <div class="crafting-desc">
       ${foodDeficit > 0 
         ? `A <strong>${sessionTargetRuns}-run session</strong> consumes ~${totalFoodNeeded} food (~${foodPerRun.toFixed(1)}/run). You have <strong>${currentStock} in stock</strong> and <strong>${rawQty} raw fish</strong> in bank. <strong>Recommendation: Cook ${foodDeficit} more</strong> (Cooking Lv ${cookLvl}, max unlocked: ${maxUnlockedFood.name}).`
-        : `You have ${currentStock} in stock, which safely covers all ~${totalFoodNeeded} food needed across ${sessionTargetRuns} runs without cooking.`}
+        : `You have ${currentStock} in stock, which safely covers all ~${totalFoodNeeded} food needed across ${sessionTargetRuns} runs without cooking (Cooking Lv ${cookLvl}, max unlocked: ${maxUnlockedFood.name}).`}
     </div>
   `;
   container.appendChild(foodCard);
 
-  // 2. POTION ADVISOR CARD
+  // 2. Potion Card
   const potCard = document.createElement('div');
   potCard.className = 'crafting-action-card potion';
 
-  // Active potion check
-  const activeMagic = (currentAudit && currentAudit.activePotions && currentAudit.activePotions.magic);
-  const activeTier = activeMagic ? activeMagic.tier : 0;
-  const attacksLeft = activeMagic ? activeMagic.attacksRemaining : 1628;
-
-  // Brewing max unlocked tier (Brewing Lv 10 per tier)
+  const activeTier = activeMagic ? (activeMagic.tier !== undefined ? activeMagic.tier : 0) : -1;
+  const attacksLeft = activeMagic ? (activeMagic.attacksRemaining || 0) : 0;
   const maxBrewTier = Math.min(10, Math.floor(brewLvl / 10));
 
   if (maxBrewTier > activeTier) {
@@ -4206,7 +4326,9 @@ function updateCraftingRecommendations() {
         <span class="crafting-stock-badge" style="background:rgba(168,85,247,0.2);color:#c084fc;border-color:rgba(168,85,247,0.4);">Upgrade Available</span>
       </div>
       <div class="crafting-desc">
-        Your currently active potion is <strong>[T0] Mystic (+2 Magic)</strong> with ${attacksLeft.toLocaleString()} attacks remaining. Your Brewing is <strong>Level ${brewLvl}</strong> (unlocks <strong>${targetPotName} +${potBoost}</strong>). Upgrading will boost party magic DPS by ~<strong>+${(maxBrewTier - activeTier) * 6}%</strong>, clearing waves faster and reducing food consumption.
+        ${activeMagic 
+          ? `Your currently active potion is <strong>[T${activeTier}] Mystic (+${(activeTier + 1) * 2} Magic)</strong> with ${attacksLeft.toLocaleString()} attacks remaining. Your Brewing is <strong>Level ${brewLvl}</strong> (unlocks <strong>${targetPotName} +${potBoost}</strong>). Upgrading will boost party magic DPS by ~<strong>+${(maxBrewTier - activeTier) * 6}%</strong>, clearing waves faster and reducing food consumption.`
+          : `You have no active combat potions. Your Brewing is <strong>Level ${brewLvl}</strong> (unlocks <strong>${targetPotName} +${potBoost}</strong>). Brewing and consuming 2 potions provides ~2,000 boosted attacks for your runs.`}
       </div>
     `;
   } else {
@@ -4216,7 +4338,7 @@ function updateCraftingRecommendations() {
         <span class="crafting-stock-badge">Sufficient Charges (${attacksLeft.toLocaleString()} Attacks)</span>
       </div>
       <div class="crafting-desc">
-        Your active magic potion is at your highest unlocked Brewing tier with ${attacksLeft.toLocaleString()} attacks remaining (covers ~${Math.floor(attacksLeft / 16)} dungeon runs).
+        Your active magic potion is at your highest unlocked Brewing tier (Level ${brewLvl}) with ${attacksLeft.toLocaleString()} attacks remaining (covers ~${Math.max(1, Math.floor(attacksLeft / 16))} dungeon runs).
       </div>
     `;
   }
